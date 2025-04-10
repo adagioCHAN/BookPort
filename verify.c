@@ -26,18 +26,21 @@ int is_valid_password(const char* pw) {
     if (len < 5 || len > 20) return 0;
     int has_alpha = 0, has_digit = 0, freq[256] = { 0 };
     for (int i = 0; i < len; i++) {
-        if (isspace(pw[i])) return 0;
-        if (isalpha(pw[i])) has_alpha = 1;
-        if (isdigit(pw[i])) has_digit = 1;
-        if (++freq[(unsigned char)pw[i]] >= 5) return 0;
+        unsigned char ch = (unsigned char)pw[i];
+
+        if (ch > 127) return 0;
+        if (isspace(ch)) return 0;
+        if (isalpha(ch)) has_alpha = 1;
+        if (isdigit(ch)) has_digit = 1;
+        if (++freq[ch] >= 5) return 0;
     }
     return has_alpha && has_digit;
 }
 
-int is_valid_bid(const char* bid) {
+ int is_valid_bid(const char* bid) {
     if (!bid || strlen(bid) == 0) return 0;
     for (int i = 0; bid[i]; i++) {
-        if (!(isalnum(bid[i]) || bid[i] == '-' || bid[i] == '.' || bid[i] == ':')) return 0;
+       if (!(isalnum(bid[i]) || bid[i] == '-' || bid[i] == '.' || bid[i] == ':' || bid[i] == ' ')) return 0;
     }
     return 1;
 }
