@@ -4,17 +4,16 @@
 #include <ctype.h>
 #include "common.h"
 
-// 이거 login.c에 정의돼있을거같은데 그냥 썼음
+// 이거 login.c나 common.h에 정의돼있을거같은데 그냥 썼음
 #define MIN_PW_LEN 5
 #define MAX_PW_LEN 20
 
+// 전역 로그인 상태 변수들. run_login() 시점에 설정되어 있어야 함
+extern int is_logged_in;
+extern User current_user; 
+
 extern void run_verify(); // 무결성 검사
 extern void run_logout(); // 로그아웃
-
-// 전역 로그인 상태 변수들
-extern int is_logged_in;
-extern char current_user_id[MAX_ID];
-extern User current_user; // run_login() 시점에 설정되어 있어야 함
 
 
 // 공백류 처리 (개행은 유지)
@@ -114,15 +113,86 @@ void change_password() {
 
     if (strcmp(new_pw, current_user.password) == 0) {
         printf(".!! Error: Password is the same as before.\n");
-        return;
-    }
-
-    if (!validate_password(new_pw)) {
         return; // 오류 메시지는 내부에서 출력됨
     }
 
+    if (!validate_password(new_pw)) return;
+
     // ===== 연결 리스트를 통한 파일 수정 =====
 
+    typedef struct Node {
+        char line[512];
+        char studentId[MAX_ID];
+        struct Node* next;
+    } Node;
+
+    FILE* fp = fopen(USER_FILE, "r");
+    if (!fp) return;
+
+    Node *head = NULL, *tail = NULL;
+    char buf[512];
+    while (fgets(buf, sizeof(buf), fp)) {
+        Node* node = malloc(sizeof(Node));
+        strcpy(node->line, buf);
+        node->next = NULL;
+
+        char tmp[512];
+        strcpy(tmp, buf);
+        strtok(tmp, ",");                       // name
+        char* sid = strtok(NULL, ",");          // id
+        strncpy(node->studentId, sid, MAX_ID);
+
+        if (!head) head = node;
+        else tail->next = node;
+        tail = node;
+    }
+    fclose(fp);
+
+    // 새 비밀번호를 반영해서 다시 파일에 쓰기
+    fp = fopen(USER_FILE, "w");
+    Node* cur = head;
+    while (cur) {
+        // 비밀번호 변경된 줄 작성
+        if (strcmp(cur->studentId, current_user.studentId) == 0) {
+            fprintf(fp, "%s,%s,%s,", current_user.name, current_user.studentId, new_pw);
+            for (int i = 0; i < 5; i++) {
+                fprintf(fp, "%s", current_user.lentBids[i]);
+                if (i < 4) fprintf(fp, ";");
+            }
+            fprintf(fp, ",%d\n", current_user.lendAvailable);
+            // current_user 비밀번호도 갱신
+            strcpy(current_user.password, new_pw);
+        } else {
+            fputs(cur->line, fp);
+        }
+        cur = cur->next;
+    }
+    fclose(fp);
+
+    // 메모리 해제
+    while (head) {
+        Node* temp = head;
+        head = head->next;
+        free(temp);
+    }
+
+    printf("Password has been changed.\n");
+}
+
+
+// ### 회원 탈퇴 ###
+void withdraw_user() {
+    printf("BookPort: Do you want to withdraw?(.../No) > ");
+    char input[100];
+    if (!fgets(input, sizeof(input), stdin)) return;
+    input[strcspn(input, "\n")] = '\0';
+
+    if (strcmp(input, "No") == 0) {
+        printf("Withdrawal canceled.\n");
+        return;
+    }
+
+    // 1. 파일 읽어와 연결 리스트로 구성
     typedef struct UserNode {
         char line[512];
         char studentId[MAX_ID];
@@ -131,7 +201,7 @@ void change_password() {
 
     FILE *fp = fopen(USER_FILE, "r");
     if (!fp) {
-        printf(".!! Error: Failed to open user file.\n");
+        printf(".!! Error: Unable to open user data.\n");
         return;
     }
 
@@ -144,10 +214,10 @@ void change_password() {
         node->next = NULL;
         strcpy(node->line, buf);
 
-        char copy[512];
-        strcpy(copy, buf);
-        strtok(copy, ",");                 // name
-        char* sid = strtok(NULL, ",");     // student ID
+        char tmp[512];
+        strcpy(tmp, buf);
+        strtok(tmp, ",");              // name
+        char* sid = strtok(NULL, ","); // studentId
         if (!sid) {
             free(node);
             continue;
@@ -160,103 +230,18 @@ void change_password() {
     }
     fclose(fp);
 
-    // 새 비밀번호를 반영해서 다시 파일에 쓰기
+    // 2. 탈퇴 대상 제외 후 덮어쓰기
     fp = fopen(USER_FILE, "w");
     if (!fp) {
-        printf(".!! Error: Failed to write user file.\n");
+        printf(".!! Error: Unable to open user data for writing.\n");
         return;
     }
 
     UserNode* cur = head;
     while (cur) {
-        if (strcmp(cur->studentId, current_user_id) == 0) {
-            // 비밀번호 변경된 줄 작성
-            fprintf(fp, "%s,%s,%s,", current_user.name, current_user.studentId, new_pw);
-            for (int i = 0; i < 5; i++) {
-                fprintf(fp, "%s", current_user.lentBids[i]);
-                if (i < 4) fprintf(fp, ";");
-            }
-            fprintf(fp, ",%d\n", current_user.lendAvailable);
-
-            // current_user 비밀번호도 갱신
-            strcpy(current_user.password, new_pw);
-        } else {
-            fputs(cur->line, fp);
+        if (strcmp(cur->studentId, current_user.studentId) != 0) {
+            fputs(cur->line, fp); // 탈퇴 대상이 아니면 그대로 씀
         }
-        cur = cur->next;
-    }
-    fclose(fp);
-
-    // 메모리 해제
-    while (head) {
-        UserNode* tmp = head;
-        head = head->next;
-        free(tmp);
-    }
-    printf("\u2026 Your password successfully changed\n");
-}
-
-// ### 회원 탈퇴 ###
-void withdraw_user() {
-    printf("BookPort: Do you want to withdraw?(.../No) > ");
-    char input[100];
-    if (!fgets(input, sizeof(input), stdin)) return;
-    input[strcspn(input, "\n")] = '\0';
-
-    if (strcmp(input, "No") == 0) {
-        return;
-    }
-
-    // 1. 연결 리스트 생성
-    FILE *fp = fopen(USER_FILE, "r");
-    if (!fp) {
-        printf(".!! Error: Failed to open user data.\n");
-        return;
-    }
-
-    typedef struct UserNode {
-        char line[512];
-        struct UserNode* next;
-    } UserNode;
-
-    UserNode* head = NULL;
-    UserNode* tail = NULL;
-
-    char buf[512];
-    while (fgets(buf, sizeof(buf), fp)) {
-        char copy[512];
-        strcpy(copy, buf);
-
-        // 학번 추출
-        char* name = strtok(copy, ",");
-        char* sid  = strtok(NULL, ",");
-        if (!sid) continue;
-
-        if (strcmp(sid, current_user_id) == 0) {
-            continue;  // 탈퇴 대상 → 연결하지 않음
-        }
-
-        UserNode* newNode = (UserNode*)malloc(sizeof(UserNode));
-        if (!newNode) continue;
-        strcpy(newNode->line, buf);
-        newNode->next = NULL;
-
-        if (!head) head = newNode;
-        else tail->next = newNode;
-        tail = newNode;
-    }
-    fclose(fp);
-
-    // 2. 덮어쓰기
-    fp = fopen(USER_FILE, "w");
-    if (!fp) {
-        printf(".!! Error: Unable to write user data.\n");
-        return;
-    }
-
-    UserNode* cur = head;
-    while (cur) {
-        fputs(cur->line, fp);
         cur = cur->next;
     }
     fclose(fp);
@@ -268,12 +253,11 @@ void withdraw_user() {
         free(temp);
     }
 
+    // 4. 후처리
     printf("Withdrawal successful.\n");
-    run_verify(); // 무결성 검사
-    run_logout();
-    // run_login(), run_logout()에서 밑 두 변수들 조정해주면 좋을듯.
-    // is_logged_in = 0;
-    // current_user_id[0] = '\0';
+    run_verify();
+    run_logout();  // 로그인 해제
+    // logout에서 is_logged_in = 0, current_user 초기화 필요
 }
 
 // run_myinfo: 메인 + 부 프롬프트
