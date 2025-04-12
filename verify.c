@@ -9,7 +9,6 @@
 #define MAX_LINE 500
 #define MAX_USERS 1000
 #define MAX_BOOKS 1000
-#define MAX_LEND 1000
 
 
 // 사용자 정보 관련 함수
@@ -45,6 +44,8 @@ int is_unique_student_id(const char* id) {
 
     char line[MAX_LINE];
     while (fgets(line, sizeof(line), file)) {
+		line[strcspn(line, "\n")] = 0; // Remove newline character
+
         User user;
         char* token = strtok(line, ",");
         if (token) strncpy(user.name, token, MAX_NAME);
@@ -77,11 +78,7 @@ int is_valid_password(const char* pw) {
 }
 
 int is_valid_lendavailable(const int* lendAvailable) {
-	if (lendAvailable < 0 || lendAvailable > 5) return 0;
-	if (!isdigit(lendAvailable)) return 0;
-    if (lendAvailable < 0)  return 0;
-
-    return 1;
+    return lendAvailable >= 0 && lendAvailable <= 5;
 }
 
 
@@ -102,26 +99,26 @@ int is_valid_book_title(const char* title) {
 }
 
 int is_valid_book_author(const char* author) {
-    int strlen = strlen(author);
+    int len = strlen(author);
     if (len < 1) return 0;
 
     for (int i = 0; i < len; i++) {
-        if (isspace((unsigned char)title[i]))
+        if (isspace((unsigned char)author[i]))
             return 0;
     }
 
-    if (isspace((unsigned char)title[0]) || isspace((unsigned char)title[len - 1]))
+    if (isspace((unsigned char)author[0]) || isspace((unsigned char)author[len - 1]))
         return 0;
 
     return 1;
 }
 
 int is_valid_bid(const char* bid) {
-    int len = strlen(title);
+    int len = strlen(bid);
     if (len < 1) return 0;
 
     for (int i = 0; i < len; i++) {
-        if (isspace((unsigned char)title[i]) && title[i] != ' ')
+        if (isspace((unsigned char)bid[i]) && bid[i] != ' ')
             return 0;
 
 		if (!isalnum((unsigned char)bid) && bid[i] != '-' && bid[i] != '.' && bid[i] != ':')
@@ -161,9 +158,8 @@ int is_valid_flag(const char* flag) {
 }
 
 int is_meaningful_flag(const char* flag) {
-    if (flag = "Y") return 1;
-    else if(flag = "N") return 0;
-} // 대출 가능 = 1, 대출 불가능 = 0
+    return flag && (strcmp(flag, "Y") == 0;
+}   // 대출 가능 = 1, 대출 불가능 = 0
 
 
 // 대출/반납 정보 관련 함수
@@ -175,9 +171,14 @@ int is_valid_date(const char* date) {
     if (sscanf(date, "%4d/%2d/%2d", &y, &m, &d) == 3 ||
         sscanf(date, "%4d-%2d-%2d", &y, &m, &d) == 3 ||
         sscanf(date, "%8s", clean) == 1 && sscanf(clean, "%4d%2d%2d", &y, &m, &d) == 3) {
-        if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return 0;
-		if (m == 2 && d > 29) return 0;
-        return 1;
+        if (y < 1900 || y > 2100 || m < 1 || m > 12) return 0;
+
+		int error[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+		if (d < 1 || d > error[m - 1]) return 0;
+		if (m == 2 && d == 29) {
+			if ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)) return 1;
+			else return 0;
+		}
     }
 
     return 0;
@@ -188,6 +189,5 @@ int is_valid_overdue(const char* overdue) {
 }
 
 int is_meaningful_overdue(const char* overdue) {
-    if (overdue = "Y") return 1;
-    else if (overdue = "N") return 0;
-} //  연체 = 1, 연체되지 않음 = 0
+    return overdue && (strcmp(overdue, "Y") == 0;
+}   // 연체 = 1, 연체되지 않음 = 0

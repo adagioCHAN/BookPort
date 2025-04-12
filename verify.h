@@ -1,5 +1,5 @@
-#ifndef RULE.H
-#define RULE.H
+#ifndef VERIFY_H
+#define VERIFY_H
 
 #include "common.h"  // User 등 사용 가능
 
@@ -12,10 +12,10 @@ int is_valid_student_id(const char* id);						// 문법 규칙
 int is_unique_student_id(const char* id);						// 의미 규칙
 
 //	비밀번호 검사
-int is_valid_password(const char* name);						// 문법 규칙
+int is_valid_password(const char* pw);						// 문법 규칙
 
 //	대출 가능 도서 개수 검사
-int is_valid_lendavailable(const int* lendAvaiable);			// 문법 규칙
+int is_valid_lendavailable(const int* lendAvailable);			// 문법 규칙
 
 
 
