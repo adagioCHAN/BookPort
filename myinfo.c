@@ -21,7 +21,8 @@ void trim(char* str) {
     while (len > 0 && is_custom_whitespace(str[len - 1])) str[--len] = '\0';
 }
 
-// 비밀번호 문법 검사
+// 비밀번호 문법 검사. 
+// 회원가입할때 사용한 함수 있으면 그거 써도 될듯 싶다.
 // 반환값 1 = 유효, 0 = 에러 (에러 메시지 출력 포함)
 // 이거 login.c에 들어있을 것 같은데 여기서 그냥 썼음.
 int validate_password(const char *pw) {
@@ -276,10 +277,10 @@ void withdraw_user() {
     printf("Withdrawal successful.\n");
     run_verify();
     run_logout();  // 로그인 해제
-    // run_logout()에서 is_logged_in = 0, current_user 초기화 필요!
+    // run_logout()에서 is_logged_in = 0 초기화 필요!
 }
 
-// run_myinfo: 메인 + 부 프롬프트
+// run_myinfo: 사용자 정보출력 및 부 프롬프트
 void run_myinfo() {
     
     // 1. 사용자 기본 정보 출력
