@@ -1,5 +1,13 @@
 #include "common.h"
+#include <stdio.h>  // EOF ë° getchar() ì¸ì‹ ìœ„í•´ í•„ìš”
+#include <string.h> 
 
-// ·Î±×ÀÎ ¿©ºÎ ÆÇ´Ü
-int is_logged_in = 0; // ·Î±×ÀÎ ½Ã 1
+// ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ç´ï¿½
+int is_logged_in = 0; // ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½ 1
 char current_user_id[MAX_ID] = "";
+
+// ì…ë ¥ì´ ë²„í¼ë¥¼ ì´ˆê³¼í•˜ì˜€ì„ ë•Œ flushí•˜ëŠ” ê¸°ëŠ¥
+void flush_stdin() {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+}
