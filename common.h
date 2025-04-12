@@ -1,13 +1,13 @@
 #ifndef DATA_STRUCTURES_H
 #define DATA_STRUCTURES_H
 
-#define MAX_NAME 100
+#define MAX_NAME 101
 #define MAX_ID 10
-#define MAX_PW 20
-#define MAX_BID 105
+#define MAX_PW 21
 
 #define MAX_TITLE 50
-#define MAX_AUTHOR 30
+#define MAX_AUTHOR 50
+#define MAX_BID 50
 
 #define MAX_DATE 11
 
@@ -30,16 +30,16 @@ typedef struct {
     char title[MAX_TITLE];                   // 제목
     char author[MAX_AUTHOR];                 // 저자
     char bid[MAX_BID];                       // 도서 고유 BID
-    int isAvailable;                         // 대여 가능 여부 (0: 가능, 1: 대여 중)
+    char isAvailable;                         // 대여 가능 여부 ("Y": 대출 가능, "N": 대출 불가능)
 } Book;
 
 // 대출/반납 구조체
 typedef struct {
     char userid[MAX_ID];                     // 사용자 학번
     char bookBid[MAX_BID];                   // 도서 BID
-    char borrowDate[MAX_DATE];              // 대출일 (yyyy-mm-dd)
-    char returnDate[MAX_DATE];              // 반납일 (yyyy-mm-dd)
-    int isOverdue;                           // 연체 여부 (0: 정상, 1: 연체)
+    char borrowDate[MAX_DATE];               // 대출일 (yyyy-mm-dd)
+    char returnDate[MAX_DATE];               // 반납일 (yyyy-mm-dd)
+    char isOverdue;                           // 연체 여부 (0: 정상, 1: 연체)
 } Lend_Return;
 
 // 로그인 여부와 사용자 ID
