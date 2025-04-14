@@ -86,6 +86,43 @@ int is_valid_password(const char* pw) {
 	else return 5;
 }
 
+int is_correct_password(const char* id, const char* pw) {
+    FILE* file = fopen("users.txt", "r");
+    User user = { 0 };
+    char password[MAX_PW];
+
+    if (!file)
+        return 0;
+
+    char line[MAX_LINE];
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = 0;
+
+        char* token = strtok(line, ",");
+        if (token) strncpy(user.name, token, MAX_NAME);
+
+        token = strtok(NULL, ",");
+        if (token) strncpy(user.studentId, token, MAX_ID);
+
+        if (strcmp(user.studentId, id) == 0) {
+            token = strtok(NULL, ",");
+            if (token) strncpy(user.password, token, MAX_PW);
+
+            if (strcmp(user.password, pw) == 0) {
+                fclose(file);
+                return 1;
+            }
+            else {
+                fclose(file);
+                return 0;
+            }
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
+
 int is_valid_lendavailable(const int* lendAvailable) {
     return lendAvailable >= 0 && lendAvailable <= 5;
 }

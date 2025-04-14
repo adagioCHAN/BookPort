@@ -9,10 +9,11 @@ int is_valid_student_name(const char* name);					// 문법 규칙
 
 //	학번 검사
 int is_valid_student_id(const char* id);						// 문법 규칙
-int is_unique_student_id(const char* id);						// 의미 규칙
+int is_unique_student_id(const char* id);						// 학번 중복 확인
 
 //	비밀번호 검사
-int is_valid_password(const char* pw);						// 문법 규칙
+int is_valid_password(const char* pw);							// 문법 규칙
+int is_correct_password(const char* id, const char* pw);		// 올바른 pw 확인
 
 //	대출 가능 도서 개수 검사
 int is_valid_lendavailable(const int* lendAvailable);			// 문법 규칙
@@ -28,7 +29,7 @@ int is_valid_book_author(const char* author);					// 문법 규칙
 
 // 도서 고유 BID 검사
 int is_valid_bid(const char* bid);								// 문법 규칙
-int is_unique_bid(const char* bid);								// 의미 규칙
+int is_unique_bid(const char* bid);								// bid 중복 확인
 
 // 대출 가능 여부 검사
 int is_valid_flag(const char* flag);							// 문법 규칙
