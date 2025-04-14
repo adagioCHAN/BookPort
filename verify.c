@@ -14,28 +14,34 @@
 // 사용자 정보 관련 함수
 int is_valid_student_name(const char* name) {
     int len = strlen(name);
-    if (!name || len < 1 || len > 100)   return 0;
+    if (len == 0)   return 1;
+    if (|| len < 1 || len > 100) return 2;
     for (int i = 0; i < len; i++) {
-        if (!isalpha(name[i]) && name[i] != ' ')
-            return 0;
+        if (!isalpha(name[i])
+            return 3;
+        else if (name[i] != ' ')
+            return 4;
     }
 
-    return 1;
+    return 0;
 }
 
 int is_valid_student_id(const char* id) {
-    if (!id || strlen(id) != 9 || id[0] == '0') return 0;
+	if (!id) return 1;
+    if (strlen(id) != 9) return 2;
+	if (id[0] == '0') return 3;
 
     int count[10] = { 0 };
     for (int i = 0; i < 9; i++) {
-        if (!isdigit(id[i])) return 0;
+        if (id[i] == ' ') return 4;
+        if (!isdigit(id[i])) return 5;
 
         count[id[i] - '0']++;
     }
 
-    for (int i = 0; i < 10; i++) if (count[i] >= 8) return 0;
+    for (int i = 0; i < 10; i++) if (count[i] >= 8) return 6;
 
-    return 1;
+    return 0;
 }
 
 int is_unique_student_id(const char* id) {
@@ -44,7 +50,7 @@ int is_unique_student_id(const char* id) {
 
     char line[MAX_LINE];
     while (fgets(line, sizeof(line), file)) {
-		line[strcspn(line, "\n")] = 0; // Remove newline character
+		line[strcspn(line, "\n")] = 0; 
 
         User user;
         char* token = strtok(line, ",");
@@ -65,16 +71,19 @@ int is_unique_student_id(const char* id) {
 
 int is_valid_password(const char* pw) {
     int len = strlen(pw);
-    if (!pw || len < 5 || len > 20) return 0;
+	if (!pw) return 1;
+	if (len < 5 || len > 20) return 2;
 
     int has_alpha = 0, has_digit = 0, freq[256] = { 0 };
     for (int i = 0; i < len; i++) {
-        if (isspace(pw[i])) return 0;
+        if (isspace(pw[i])) return 3;
         if (isalpha(pw[i])) has_alpha = 1;
         if (isdigit(pw[i])) has_digit = 1;
-        if (++freq[(unsigned char)pw[i]] >= 5) return 0;
+        if (++freq[(unsigned char)pw[i]] >= 5) return 4;
     }
-    return has_alpha && has_digit;
+
+    if (has_alpha == 1 && has digit == 1;) return 0;
+	else return 5;
 }
 
 int is_valid_lendavailable(const int* lendAvailable) {
