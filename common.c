@@ -1,5 +1,70 @@
-#include "common.h"
+#include <stdio.h>
+#include <string.h>
 
-// ·Î±×ÀÎ ¿©ºÎ ÆÇ´Ü
-int is_logged_in = 0; // ·Î±×ÀÎ ½Ã 1
-char current_user_id[MAX_ID] = "";
+
+#include "common.h"
+#include "verify.h"
+#include "function.h"
+
+// ë¡œê·¸ì¸ ì—¬ë¶€ íŒë‹¨
+int is_logged_in = 0; // ë¡œê·¸ì¸ ì‹œ 1
+User current_user = { 0 };
+
+void run_login() {
+    if (is_logged_in == 1)
+        printf(".!! You are already logged in.\n");
+
+    else {
+        User user = login_user();
+        if (user.studentId[0] == '\0')
+            printf("Login canceled.\n");
+        else {
+            current_user = user;
+            is_logged_in = 1;
+            printf("Login success.\n");
+        }
+    }
+}
+
+void run_account() {
+    if (is_logged_in == 1)
+        printf(".!! You are already logged in.\n");
+    
+    else {
+		User user = register_user();
+        if (user.studentId[0] != '\0') {
+            FILE* file = fopen("users_data.txt", "a");
+            if (file == NULL)
+                printf(".!! Error: Failed to open file.\n");
+            else {
+                char lentBidsInfo[MAX_BID] = "";
+                for (int i = 0; i < 5; i++) {
+                    strcat(lentBidsInfo, user.lentBids[i]);
+                    if (i < 4) strcat(lentBidsInfo, ";");
+                }
+
+                fprintf(file, "%s,%s,%s,%s,%d\n",
+                    user.name,
+                    user.studentId,
+                    user.password,
+                    lentBidsInfo,
+                    user.lendAvailable
+                );
+            }
+
+            fclose(file);
+        }
+    }
+}
+
+void run_logout() {
+	if (is_logged_in == 0)
+		printf("....Cannot logout because you are not logged in\n");
+
+	else {
+		is_logged_in = 0;
+		current_user = (User){ 0 };
+		printf("...Logout completed\n");
+	}
+}
+

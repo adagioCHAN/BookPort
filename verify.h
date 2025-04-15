@@ -3,6 +3,10 @@
 
 #include "common.h"  // User 등 사용 가능
 
+#define MAX_LINE 500
+#define MAX_USERS 1000
+#define MAX_BOOKS 1000
+
 // 사용자 정보 관련 함수
 //	이름 검사
 int is_valid_student_name(const char* name);					// 문법 규칙
@@ -34,7 +38,6 @@ int is_unique_bid(const char* bid);								// bid 중복 확인
 // 대출 가능 여부 검사
 int is_valid_flag(const char* flag);							// 문법 규칙
 int is_meaningful_flag(const char* flag);						// 의미 규칙
-
 
 
 // 대출/반납 정보 관련 함수

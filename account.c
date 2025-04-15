@@ -1,9 +1,11 @@
-﻿#include <stdio.h>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 
 #include "common.h"
 #include "verify.h"
+
 
 User register_user() {
     User new_user = { 0 };
@@ -41,8 +43,6 @@ User register_user() {
         if (validResult == 0)
             break;
     }
-
-
 
     // 학번 입력
     while (1) {
@@ -142,7 +142,7 @@ User register_user() {
         }
         else {
             for (int i = 0; i < 5; i++)
-				new_user.lendBids[i][0] = '\0'; // 대여한 책 BID 초기화
+				new_user.lentBids[i][0] = '\0'; // 대여한 책 BID 초기화
             new_user.lendAvailable = 5; // 대여 가능 권수 초기화
 
             printf("Account successfully created.\n");

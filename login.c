@@ -1,4 +1,5 @@
-﻿#include <stdio.h>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 
@@ -143,7 +144,7 @@ User login_user() {
 		}
         else {
             if (is_correct_password(studentId, buffer)) {
-                strcpy(password, buffer, MAX_PW);
+                strncpy(password, buffer, MAX_PW);
                 break;
             }
             else {
@@ -164,12 +165,9 @@ User login_user() {
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
-        if (strcmp(buffer, "No") == 0) {
-            printf("Login canceled.\n");
+        if (strcmp(buffer, "No") == 0)
             return user; // 빈 사용자 구조체 반환
-        }
         else {
-            printf("Login success.\n");
             user = get_user_by_id(studentId);
             return user; // 성공적으로 생성된 사용자 구조체 반환
         }
