@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -51,10 +52,13 @@ int compare_record_entry(const void* a, const void* b) {
 }
 
 void run_record() {
-	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry));
 	int user_record_count = 0;
 	linked_list* lend_returndata;
 	lend_returndata = read_borrow_data();
+	int lend_return_count = 0;
+	for (node* count = lend_returndata->head; count != NULL; count = count->next) lend_return_count++;
+	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry));
+
 
 	for (node* j = lend_returndata->head; j != NULL; j = j->next) {
 		Lend_Return* l = (Lend_Return*)j->data;
