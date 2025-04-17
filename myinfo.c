@@ -55,7 +55,7 @@ void run_record() {
 	int user_record_count = 0;
 	linked_list* lend_returndata;
 	lend_returndata = read_borrow_data();
-	int lend_return_count;
+	int lend_return_count = 0;
 	for (node* count = lend_returndata->head; count != NULL; count = count->next) lend_return_count++;
 	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry));
 
