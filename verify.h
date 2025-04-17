@@ -22,8 +22,6 @@ int is_correct_password(const char* id, const char* pw);		// 올바른 pw 확인
 //	대출 가능 도서 개수 검사
 int is_valid_lendavailable(const int* lendAvailable);			// 문법 규칙
 
-
-
 // 도서 정보 관련 함수
 // 도서명 검사
 int is_valid_book_title(const char* title);						// 문법 규칙
