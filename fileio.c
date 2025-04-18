@@ -23,11 +23,11 @@ bool update_file(const char* file_name, linked_list* list) {
 		}
 		else if (file_name == BOOK_FILE) {
 			book_data = (Book*)current->data;
-			fprintf(fp, "%s,%s,%s,%d\n", book_data->title, book_data->author, book_data->bid, book_data->isAvailable);
+			fprintf(fp, "%s,%s,%s,%c\n", book_data->title, book_data->author, book_data->bid, book_data->isAvailable);
 		}
 		else if (file_name == LEND_RETURN_FILE) {
 			borrow_data = (Lend_Return*)current->data;
-			fprintf(fp, "%s,%s,%s,%s,%d\n", borrow_data->userid, borrow_data->bookBid, borrow_data->borrowDate, borrow_data->returnDate, borrow_data->isOverdue);
+			fprintf(fp, "%s,%s,%s,%s,%c\n", borrow_data->userid, borrow_data->bookBid, borrow_data->borrowDate, borrow_data->returnDate, borrow_data->isOverdue);
 		}
 		current = current->next;
 	}
