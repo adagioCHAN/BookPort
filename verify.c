@@ -51,13 +51,13 @@ int is_valid_student_id(const char* id) {
 
 int is_unique_student_id(const char* id) {
     FILE* file = fopen(USER_FILE, "r");
-    if (!file)  return 1;
+    if (!file)  return -1; //file error
 
     char line[MAX_LINE];
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = 0;
 
-        User user;
+        User user={0}; //초기화
         char* token = strtok(line, ",");
         if (token) strncpy(user.name, token, MAX_NAME);
 
@@ -71,7 +71,7 @@ int is_unique_student_id(const char* id) {
     }
 
     fclose(file);
-    return 1;
+    return 1; //unique
 }
 
 int is_valid_password(const char* pw) {
