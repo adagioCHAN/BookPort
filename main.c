@@ -120,14 +120,15 @@ int main() {
                 printf("Exiting program...\n");
                 break;
             }
+
             else if (strcmp(cmd, "verify") == 0) run_verify();
             else if (strcmp(cmd, "account") == 0) run_account();
             else if (strcmp(cmd, "login") == 0) run_login();
             else if (strcmp(cmd, "logout") == 0) run_logout();
-            else if (strcmp(cmd, "search") == 0) run_search();
+            else if (strcmp(cmd, "search") == 0) run_search(1);
             else if (strcmp(cmd, "borrow") == 0) run_borrow();
             else if (strcmp(cmd, "return") == 0) run_return();
-            else if (strcmp(cmd, "myinfo") == 0) run_myinfo();
+            //else if (strcmp(cmd, "myinfo") == 0) run_myinfo();
         }
     }
 

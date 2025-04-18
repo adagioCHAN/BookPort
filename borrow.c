@@ -3,22 +3,37 @@
 #include <string.h>
 #include <ctype.h>
 #include "common.h"
+#include "verify.h"
 
 #define TEMP_FILE "temp_user.txt"
-
 void run_borrow() {
     if (!is_logged_in) {
         printf("You must login first to borrow books.\n");
         return;
     }
-    if (current_user.lendAvailable <= 0) {
+    /*if (current_user.lendAvailable <= 0) {
         printf("You cannot borrow more books.\n");
         return;
-    }
-    run_search();
+    }*/
+    int search_result = run_search(0);
     char bid_input[MAX_BID];
     Lend_Return lend;
+
+    bool book_integrity = true;
+    linked_list* book_list = read_book_data(&book_integrity);
+    if (!book_integrity) {
+        print_list(book_list, 4);
+        return -1;
+    }
+
+    node* current = book_list->head;
     while (1) {
+        if (search_result == 0) { run_search(0); }
+        if (search_result == 2) {
+            printf("Error: No available books found among the search results\n");
+            search_result = 0;
+            continue;
+        }
         printf("Enter BID of the book to borrow > ");
         fgets(bid_input, sizeof(bid_input), stdin);
         trim(bid_input);
@@ -28,34 +43,42 @@ void run_borrow() {
             continue;
         }
         // 검색된 책 중 BID 일치 여부 확인
-        FILE* file = fopen(BOOK_FILE, "r");
-        if (!file) {
-            printf("Cannot open file.\n");
-            return;
-        }
-        char status_char;
         int found = 0;
-        Book book;
-        printf("\n[Search Result]\n");
+        printf("\n[Search BID Result]\n");
 
-        while (fscanf_s(file, "%49[^,],%29[^,],%104[^,],%c\n",
-            book.title, (unsigned)(sizeof(book.title)),
-            book.author, (unsigned)(sizeof(book.author)),
-            book.bid, (unsigned)(sizeof(book.bid)),
-            &status_char, 1) == 4) {
-            if (!strcmp(book.bid, bid_input)) {
-                found++;
-                strcpy(lend.bookBid, book.bid);
-                if (status_char != 'Y') {
-                    printf("Error: already 이미 대출된 책\n");
-                    found++;
+        int count_y = 0;
+        while (current) {
+            Book* book = (Book*)current->data;
+            int match_all = 1;
+            if (!strcmp(book->bid, bid_input)) {
+                found = 1;
+                strcpy(lend.bookBid, book->bid);
+                if (book->isAvailable != 'Y') {
+                    printf("Error: The book is already borrowed.\n");
+                    found = 2;
                 }
+                book->isAvailable = 'N';
                 break;
             }
+            current = current->next;
         }
-        fclose(file);
+        /* while (fscanf_s(file, "%49[^,],%29[^,],%104[^,],%c\n",
+             book.title, (unsigned)(sizeof(book.title)),
+             book.author, (unsigned)(sizeof(book.author)),
+             book.bid, (unsigned)(sizeof(book.bid)),
+             &status_char, 1) == 4) {
+             if (!strcmp(book.bid, bid_input)) {
+                 found=1;
+                 strcpy(lend.bookBid, book.bid);
+                 if (status_char != 'Y') {
+                     printf("Error: The book is already borrowed.\n");
+                     found=2;
+                 }
+                 break;
+             }
+         }*/
         if (found == 0) {
-            printf("Error: no book 해당하는 책 없음");
+            printf("Error: No matching book found.\n");
             continue;
         }
         else if (found == 2) {
@@ -63,6 +86,10 @@ void run_borrow() {
         }
         break;
     }
+    //linked_list* user_list = read_user_data();
+    //node* current1 = user_list->head;
+    //linked_list* lend_list = read_borrow_data();
+    //node* current2 = lend_list->head;
 
     char loan_date[MAX_DATE];
     while (1)
@@ -86,9 +113,12 @@ void run_borrow() {
         printf("Borrowing cancelled.\n");
         return;
     }
-    if (!updata_file(lend)) {
+    update_file(BOOK_FILE, book_list);
+    return;
+
+    /*if (!update_file(USER_FILE,user_list)|| !update_file(BOOK_FILE,book_list)|| !update_file(LEND_RETURN_FILE,lend_list)) {
         return;
-    }
+    }*/
 }
 
 int updata_file(Lend_Return lend) {
@@ -159,7 +189,7 @@ int updata_file(Lend_Return lend) {
         printf("Cannot open file_lend.\n");
         return 0;
     }
-    fprintf(file_lend, "%s,%s,%s,%s,%c\n", current_user.studentId, lend.bookBid, lend.borrowDate, "0", 'N');
+    fprintf(file_lend, "\n%s,%s,%s,%s,%c", current_user.studentId, lend.bookBid, lend.borrowDate, "0", 'N');
     fclose(file_lend);
 
     return 1;

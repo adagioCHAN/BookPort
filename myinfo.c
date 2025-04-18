@@ -51,19 +51,23 @@ int compare_record_entry(const void* a, const void* b) {
 }
 
 void run_record() {
-	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry)); //각 파일 linecount, load필요
+	RecordEntry* user_record = (RecordEntry*)malloc(2 * lend_return_count * sizeof(RecordEntry));
 	int user_record_count = 0;
-	for (int i = 0; i < lend_return_count; i++) {
-		if (strcmp(current_user.studentId, Lend_Return[i].userid) == 0) {	
-			strcpy(user_record[user_record_count].date, Lend_Return[i].borrowDate);
+	linked_list* lend_returndata;
+	lend_returndata = read_borrow_data();
+
+	for (node* j = lend_returndata->head; j != NULL; j = j->next) {
+		Lend_Return* l = (Lend_Return*)j->data;
+		if (strcmp(current_user.studentId, l->userid) == 0) {	
+			strcpy(user_record[user_record_count].date, l->borrowDate);
 			strcpy(user_record[user_record_count].type, "borrow");
-			strcpy(user_record[user_record_count].bid, Lend_Return[i].bookBid);
+			strcpy(user_record[user_record_count].bid, l->bookBid);
 			user_record_count++;
-			if (Lend_Return[i].returnDate[0] != '\0') {
-				strcpy(user_record[user_record_count].date, Lend_Return[i].returnDate);
-				strcpy(user_record[user_record_count].type, "return");
-				strcpy(user_record[user_record_count].bid, Lend_Return[i].bookBid);
-				user_record_count++;
+		if (l->returnDate[0] != '\0') {
+			strcpy(user_record[user_record_count].date, l->returnDate);
+			strcpy(user_record[user_record_count].type, "return");
+			strcpy(user_record[user_record_count].bid, l->bookBid);
+			user_record_count++;
 			}
 		}
 	}
@@ -81,6 +85,8 @@ void run_record() {
 
 void run_manage() {
 	char input[100];
+	linked_list* bookdata;
+	bookdata = read_book_data();
 
 	while (1) {
 		printf("BookPort: My info - Enter command>");
@@ -97,11 +103,12 @@ void run_manage() {
 			for (int i = 0; i < 5; i++) {
 				if (strlen(current_user.lentBids[i]) == 0) continue;
 
-				for (int j = 0; j < bookcount; j++) {
-					if (strcmp(Book[j].bookBid, current_user.lentBids[i]) == 0) {
-						printf("Title: %s\n", Book[j].title);
-						printf("Author: %s\n", Book[j].author);
-						printf("BID: %s\n", Book[j].bid);
+				for (node* j = bookdata->head; j != NULL; j = j->next) {
+					Book* b = (Book*)j->data;
+					if (strcmp(b->bid, current_user.lentBids[i]) == 0) {
+						printf("Title: %s\n", b->title);
+						printf("Author: %s\n", b->author);
+						printf("BID: %s\n", b->bid);
 					}
 				}
 			}

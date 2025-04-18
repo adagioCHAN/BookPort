@@ -44,18 +44,26 @@ typedef struct node {
 typedef struct linked_list {
     struct node* head;
     struct node* tail;
+    int counter;
 } linked_list;
 
 
-bool update_file(char* file_name, linked_list* list);
+bool update_file(const char* file_name, linked_list* list);
 linked_list* read_user_data();
 linked_list* read_book_data();
 linked_list* read_borrow_data();
 void insert_back(linked_list* list, void* data);
 void insert_front(linked_list* list, void* data, int type);
 void* find(linked_list* list, void* data, int type);
+Book* find_by_bid(linked_list* list, const char* bid);
+User* find_by_userId(linked_list* list, const char* userId);
 void remove_node(linked_list* list, void* data, int type);
 void print_list(linked_list* list, int type);
+bool check_equality(void* data1, void* data2, int type);
+Book* find_by_author(linked_list* list, const char* author);
+Book* find_by_title(linked_list* list, const char* title);
+bool check_empty(char* token, bool* file_integrity);
+void add_violation_line(linked_list* list, char* line);
 
 // ����/�ݳ� ����ü
 typedef struct {
@@ -76,7 +84,7 @@ void run_verify();
 void run_account();
 void run_login();
 void run_logout();
-void run_search();
+int run_search(int mode);
 void run_borrow();
 void run_return();
 void run_myinfo();
