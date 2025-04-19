@@ -1,11 +1,10 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "common.h"
 
-// ¹®ÀÚ¿­ ¾ÕµÚ °ø¹é Á¦°Å
-// ¿øº» ¹®ÀÚ¿­À» Á÷Á¢ ¼öÁ¤ÇÏ´Â trim ÇÔ¼ö
+
 void trim(char* str) {
     char* start = str;
     while (isspace((unsigned char)*start)) start++;
@@ -18,13 +17,14 @@ void trim(char* str) {
     while (end > start && isspace((unsigned char)*end)) end--;
     *(end + 1) = '\0';
 
-    // ¾Õ °ø¹é Á¦°Å¸¦ À§ÇØ ¹®ÀÚ¿­À» ¾ÕÀ¸·Î ÀÌµ¿
+
     if (start != str) memmove(str, start, end - start + 2);
 }
 
 
-// ¸í·É¾î Á¤±ÔÈ­
-char* get_canonical_command(char* input) {
+
+
+char* get_canonical_command(char* token) {
     struct {
         const char* synonyms[20];
         const char* canonical;
@@ -43,27 +43,27 @@ char* get_canonical_command(char* input) {
 
     for (int i = 0; i < sizeof(cmd_table) / sizeof(cmd_table[0]); i++) {
         for (int j = 0; cmd_table[i].synonyms[j]; j++) {
-            if (strcmp(input, cmd_table[i].synonyms[j]) == 0)
+            if (strcmp(token, cmd_table[i].synonyms[j]) == 0)
                 return (char*)cmd_table[i].canonical;
         }
     }
     return NULL;
 }
 
-// ¸í·É¾î Ç¥ Ãâ·Â
+// ï¿½ï¿½ï¿½É¾ï¿½ Ç¥ ï¿½ï¿½ï¿½
 void print_command_usage() {
     printf("--------------------------------------------------------------\n");
     printf(" Command | Arguments              | Description               \n");
     printf("--------------------------------------------------------------\n");
-    printf(" ? help  | None or one command    | Show help for all or a specific command\n");
-    printf(" ! verify| None                   | Proceed with file integrity verification\n");
-    printf(" in login| None                   | Move to login prompt      \n");
-    printf(" out logout| None                 | Logout                    \n");
-    printf(" / search| None                   | Display books matching a keyword\n");
-    printf(" $ borrow| None                   | Move to borrow prompt     \n");
-    printf(" a account| None                  | Move to create account prompt\n");
-    printf(" r return| None                   | Move to return prompt     \n");
-    printf(" info myinfo| None               | Show member¡¯s information \n");
+    printf(" ? help      | None or one command        | Show help for all or a specific command\n");
+    printf(" ! verify    | None                       | Proceed with file integrity verification\n");
+    printf(" in login    | None                       | Move to login prompt      \n");
+    printf(" out logout  | None                       | Logout                    \n");
+    printf(" / search    | None                       | Display books matching a keyword\n");
+    printf(" $ borrow    | None                       | Move to borrow prompt     \n");
+    printf(" a account   | None                       | Move to create account prompt\n");
+    printf(" r return    | None                       | Move to return prompt     \n");
+    printf(" info myinfo | None                       | Show member's information");
     printf("--------------------------------------------------------------\n");
 }
 
@@ -97,9 +97,9 @@ int main() {
                 print_command_usage();
                 continue;
             }
-            run_help(argument); // help.c¿¡ Á¤ÀÇµÊ
+            run_help(argument); // help.cï¿½ï¿½ ï¿½ï¿½ï¿½Çµï¿½
         }
-        // ´Ù¸¥ ¸í·É¾îµé (ÀÎÀÚ ÀÖÀ¸¸é ¿¡·¯)
+        // ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½É¾ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
         else if (strcmp(cmd, "quit") == 0 ||
             strcmp(cmd, "verify") == 0 ||
             strcmp(cmd, "account") == 0 ||
@@ -115,18 +115,20 @@ int main() {
                 continue;
             }
 
-            // ¿¬°á
+            // ï¿½ï¿½ï¿½ï¿½
             if (strcmp(cmd, "quit") == 0) {
                 printf("Exiting program...\n");
                 break;
             }
+
             else if (strcmp(cmd, "verify") == 0) run_verify();
             else if (strcmp(cmd, "account") == 0) run_account();
             else if (strcmp(cmd, "login") == 0) run_login();
             else if (strcmp(cmd, "logout") == 0) run_logout();
-            else if (strcmp(cmd, "search") == 0) run_search();
+            else if (strcmp(cmd, "search") == 0) run_search(1);
             else if (strcmp(cmd, "borrow") == 0) run_borrow();
             else if (strcmp(cmd, "return") == 0) run_return();
+
             else if (strcmp(cmd, "myinfo") == 0) run_myinfo();
         }
     }

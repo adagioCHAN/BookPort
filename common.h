@@ -1,5 +1,7 @@
-#ifndef DATA_STRUCTURES_H
+ï»¿#ifndef DATA_STRUCTURES_H
 #define DATA_STRUCTURES_H
+
+#include <stdbool.h>
 
 #define MAX_NAME 101
 #define MAX_ID 10
@@ -11,55 +13,91 @@
 
 #define MAX_DATE 11
 
-// ÆÄÀÏ °æ·Î
-#define USER_FILE "users_data.txt"             // »ç¿ëÀÚ Á¤º¸ ÆÄÀÏ
-#define BOOK_FILE "books_data.txt"             // µµ¼­ Á¤º¸ ÆÄÀÏ
-#define LEND_RETURN_FILE "lend_return_data.txt" // ´ë¿© Á¤º¸ ÆÄÀÏ
+// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+#define USER_FILE "users_data.txt"             // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+#define BOOK_FILE "books_data.txt"             // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+#define LEND_RETURN_FILE "lend_return_data.txt" // ï¿½ë¿© ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-// »ç¿ëÀÚ ±¸Á¶Ã¼
+// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼
 typedef struct {
-    char name[MAX_NAME];                      // ÀÌ¸§
-    char studentId[MAX_ID];                  // ÇĞ¹ø
-    char password[MAX_PW];                   // ºñ¹Ğ¹øÈ£
-    char lentBids[5][MAX_BID];               // ´ë¿©ÇÑ Ã¥ BID ÃÖ´ë 5±Ç (';' ¾øÀÌ ¹è¿­·Î Ã³¸®)
-    int lendAvailable;                       // ´ë¿© °¡´É ±Ç¼ö
+    char name[MAX_NAME];                      // ï¿½Ì¸ï¿½
+    char studentId[MAX_ID];                  // ï¿½Ğ¹ï¿½
+    char password[MAX_PW];                   // ï¿½ï¿½Ğ¹ï¿½È£
+    char lentBids[5][MAX_BID];               // ï¿½ë¿©ï¿½ï¿½ Ã¥ BID ï¿½Ö´ï¿½ 5ï¿½ï¿½ (';' ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­ï¿½ï¿½ Ã³ï¿½ï¿½)
+    int lendAvailable;                       // ï¿½ë¿© ï¿½ï¿½ï¿½ï¿½ ï¿½Ç¼ï¿½
 } User;
 
-// µµ¼­ ±¸Á¶Ã¼
+// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼
 typedef struct {
-    char title[MAX_TITLE];                   // Á¦¸ñ
-    char author[MAX_AUTHOR];                 // ÀúÀÚ
-    char bid[MAX_BID];                       // µµ¼­ °íÀ¯ BID
-    char isAvailable;                         // ´ë¿© °¡´É ¿©ºÎ ("Y": ´ëÃâ °¡´É, "N": ´ëÃâ ºÒ°¡´É)
+    char title[MAX_TITLE];                   // ï¿½ï¿½ï¿½ï¿½
+    char author[MAX_AUTHOR];                 // ï¿½ï¿½ï¿½ï¿½
+    char bid[MAX_BID];                       // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ BID
+    char isAvailable;                         // ï¿½inë¿© ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ("Y": ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, "N": ï¿½ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½ï¿½ï¿½)
 } Book;
 
-// ´ëÃâ/¹İ³³ ±¸Á¶Ã¼
+typedef struct node {
+    struct node* next;
+    struct node* prev;
+    void* data;
+} node;
+
+typedef struct linked_list {
+    struct node* head;
+    struct node* tail;
+    int counter;
+} linked_list;
+
+
+bool update_file(const char* file_name, linked_list* list);
+linked_list* read_user_data();
+linked_list* read_book_data();
+linked_list* read_borrow_data();
+void insert_back(linked_list* list, void* data);
+void insert_front(linked_list* list, void* data, int type);
+void* find(linked_list* list, void* data, int type);
+Book* find_by_bid(linked_list* list, const char* bid);
+User* find_by_userId(linked_list* list, const char* userId);
+void remove_node(linked_list* list, void* data, int type);
+void print_list(linked_list* list, int type);
+bool check_equality(void* data1, void* data2, int type);
+Book* find_by_author(linked_list* list, const char* author);
+Book* find_by_title(linked_list* list, const char* title);
+bool check_empty(char* token, bool* file_integrity);
+void add_violation_line(linked_list* list, char* line);
+
+// ï¿½ï¿½ï¿½ï¿½/ï¿½İ³ï¿½ ï¿½ï¿½ï¿½ï¿½Ã¼
 typedef struct {
-    char userid[MAX_ID];                     // »ç¿ëÀÚ ÇĞ¹ø
-    char bookBid[MAX_BID];                   // µµ¼­ BID
-    char borrowDate[MAX_DATE];               // ´ëÃâÀÏ (yyyy-mm-dd)
-    char returnDate[MAX_DATE];               // ¹İ³³ÀÏ (yyyy-mm-dd)
-    char isOverdue;                           // ¿¬Ã¼ ¿©ºÎ (0: Á¤»ó, 1: ¿¬Ã¼)
+    char userid[MAX_ID];                     // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ğ¹ï¿½
+    char bookBid[MAX_BID];                   // ï¿½ï¿½ï¿½ï¿½ BID
+    char borrowDate[MAX_DATE];               // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (yyyy-mm-dd)
+    char returnDate[MAX_DATE];               // ï¿½İ³ï¿½ï¿½ï¿½ (yyyy-mm-dd)
+    char isOverdue;                           // ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ (0: ï¿½ï¿½ï¿½ï¿½, 1: ï¿½ï¿½Ã¼)
 } Lend_Return;
 
-// ·Î±×ÀÎ ¿©ºÎ¿Í »ç¿ëÀÚ ID
+// ë¡œê·¸ì¸ ì—¬ë¶€ì™€ ì‚¬ìš©ì ID
 extern int is_logged_in;
-extern char current_user_id[MAX_ID];
+extern User current_user;
 
-// run ÇÔ¼ö ¼±¾ğ
+// run ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½
 void run_help(const char* argument);
 void run_verify();
 void run_account();
 void run_login();
 void run_logout();
-void run_search();
+int run_search(int mode);
 void run_borrow();
 void run_return();
 void run_myinfo();
 
-// °øÅëÀûÀ¸·Î ¾²ÀÌ´Â ÇÔ¼öµé
-void print_command_usage();                     // Ç¥ Ãâ·Â ÇÔ¼ö
-char* get_canonical_command(const char* input); // µ¿ÀÇ¾î ¡æ ´ëÇ¥¸í·É¾î
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½
+void print_command_usage();                     // Ç¥ ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
+char* get_canonical_command(const char* input); // ï¿½ï¿½ï¿½Ç¾ï¿½ ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ï¿½É¾ï¿½
 void trim(char* str);
+
+// login.c
+User login_user(); // ë¡œê·¸ì¸ í•¨ìˆ˜
+
+// account.c
+User register_user(); // íšŒì›ê°€ì… í•¨ìˆ˜
 
 #endif
