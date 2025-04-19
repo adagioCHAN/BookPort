@@ -125,8 +125,8 @@ int is_correct_password(const char* id, const char* pw) {
 
             // 비밀번호 디버깅용
             /*
-			printf("[Debug] 비밀번호 확인: %s\n", user.password);
-			printf("[Debug] 입력된 비밀번호: %s\n", pw);
+            printf("[Debug] 비밀번호 확인: %s\n", user.password);
+            printf("[Debug] 입력된 비밀번호: %s\n", pw);
             */
 
             if (strcmp(user.password, pw) == 0) {

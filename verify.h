@@ -3,6 +3,10 @@
 
 #include "common.h"  // User 등 사용 가능
 
+#define MAX_LINE 500
+#define MAX_USERS 1000
+#define MAX_BOOKS 1000
+
 // 사용자 정보 관련 함수
 //	이름 검사
 int is_valid_student_name(const char* name);					// 문법 규칙
@@ -18,8 +22,6 @@ int is_correct_password(const char* id, const char* pw);		// 올바른 pw 확인
 //	대출 가능 도서 개수 검사
 int is_valid_lendavailable(const int* lendAvailable);			// 문법 규칙
 
-
-
 // 도서 정보 관련 함수
 // 도서명 검사
 int is_valid_book_title(const char* title);						// 문법 규칙
@@ -34,7 +36,6 @@ int is_unique_bid(const char* bid);								// bid 중복 확인
 // 대출 가능 여부 검사
 int is_valid_flag(const char* flag);							// 문법 규칙
 int is_meaningful_flag(const char* flag);						// 의미 규칙
-
 
 
 // 대출/반납 정보 관련 함수

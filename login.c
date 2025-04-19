@@ -75,7 +75,7 @@ User login_user() {
         int uniqueResult = is_unique_student_id(buffer);
 
         // 로그인-학번입력 시 디버깅용
-		/* 
+        /*
         fprintf(stderr, "[DEBUG] 입력된 학번: %s\n", buffer);
 
         printf("[DEBUG] 유효성 검사 결과: %d\n", validResult);
@@ -112,7 +112,7 @@ User login_user() {
             default:
                 printf(".!! Error: An unknown error occured.\n");
                 break;
-            } 
+            }
         }
 
         // 학번 존재 여부 확인
@@ -127,7 +127,7 @@ User login_user() {
         }
     }
 
-	// 학번 디버깅용
+    // 학번 디버깅용
     /*
     printf("[DEBUG] studentId = '%s'\n", studentId);
     fflush(stdout);
@@ -140,9 +140,9 @@ User login_user() {
         buffer[strcspn(buffer, "\n")] = '\0';
 
         int validResult = is_valid_password(buffer);
-		int correctResult = is_correct_password(studentId, buffer);
+        int correctResult = is_correct_password(studentId, buffer);
 
-		// 비밀번호 디버깅용
+        // 비밀번호 디버깅용
         /*
         fprintf(stderr, "[DEBUG] 입력된 pw: %s\n", buffer);
 

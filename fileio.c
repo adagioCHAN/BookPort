@@ -143,7 +143,7 @@ linked_list* read_book_data(bool* file_integrity) {
 		free(violation_lines);
 		return list;
 	}
-	else 
+	else
 		return violation_lines;
 
 }

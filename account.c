@@ -54,14 +54,14 @@ User register_user() {
         int uniqueResult = is_unique_student_id(buffer);
 
         // 회원가입-학번입력 시 디버깅용
-		/* 
+        /*
         fprintf(stderr, "[DEBUG] 입력된 학번: %s\n", buffer);
 
         printf("[DEBUG] 유효성 검사 결과: %d\n", validResult);
         fflush(stdout);
 
-		printf("[DEBUG] 중복 검사 결과: %d\n", uniqueResult);
-		fflush(stdout);
+        printf("[DEBUG] 중복 검사 결과: %d\n", uniqueResult);
+        fflush(stdout);
 
         printf("[DEBUG] strlen(buffer) = %zu\n", strlen(buffer));
         fflush(stdout);
@@ -74,7 +74,7 @@ User register_user() {
                 strncpy(new_user.studentId, buffer, MAX_ID);
             else if (uniqueResult == 0)
                 printf(".!! Error: User information with the student ID you entered already exists\n");
-			break;
+            break;
         case 1:
             printf(".!! Error: Student ID cannot be an empty string.\n");
             break;
@@ -95,7 +95,7 @@ User register_user() {
             printf(".!! Error: An unknown error occured.\n");
             break;
         }
-        
+
         if (validResult == 0 && uniqueResult == 1)
             break;
     }
