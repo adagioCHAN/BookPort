@@ -18,16 +18,14 @@ int is_valid_student_name(const char* name) {
     for (int i = 0; i < len; i++) {
         unsigned char ch = name[i];
 
-        if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+        if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'))
             continue;  // 영어 알파벳 OK
-        }
-        else if (isspace(ch)) {
+        else if (isspace(ch))
             if (ch != ' ') return 4;  // 스페이스바 공백만 허용
-        }
-        else {
+        else
             return 3;  // 알파벳도 아니고 공백도 아님 → 외국어/기호 등
-        }
     }
+
     return 0;
 }
 

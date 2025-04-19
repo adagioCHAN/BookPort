@@ -6,7 +6,6 @@
 #include "common.h"
 #include "verify.h"
 
-
 User register_user() {
     User new_user = { 0 };
     char buffer[101];

@@ -34,6 +34,7 @@ void run_account() {
         User user = register_user();
         if (user.studentId[0] != '\0') {
             FILE* file = fopen("users_data.txt", "a");
+
             if (file == NULL)
                 printf(".!! Error: Failed to open file.\n");
             else {
@@ -61,7 +62,6 @@ void run_account() {
 void run_logout() {
     if (is_logged_in == 0)
         printf("....Cannot logout because you are not logged in\n");
-
     else {
         is_logged_in = 0;
         current_user = (User){ 0 };
