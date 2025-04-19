@@ -10,7 +10,6 @@
 #define MAX_TITLE 50
 #define MAX_AUTHOR 50
 #define MAX_BID 50
-
 #define MAX_DATE 11
 
 // ���� ���

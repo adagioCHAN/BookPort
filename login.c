@@ -153,7 +153,6 @@ User login_user() {
         fflush(stdout);
         */
 
-
         // 비밀번호 오류 처리
         if (validResult != 0) {
             switch (validResult) {

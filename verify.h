@@ -1,11 +1,11 @@
 #ifndef VERIFY_H
 #define VERIFY_H
 
-#include "common.h"  // User 등 사용 가능
-
 #define MAX_LINE 500
 #define MAX_USERS 1000
 #define MAX_BOOKS 1000
+
+#include "common.h"  // User 등 사용 가능
 
 // 사용자 정보 관련 함수
 //	이름 검사
