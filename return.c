@@ -6,7 +6,7 @@
 #include "verify.h"
 
 #define TEMP_FILE "temp_user.txt"
-int updata_file_2(Lend_Return);
+int updata_file(Lend_Return lend);
 
 void run_return() {
     if (!is_logged_in) {
@@ -93,7 +93,7 @@ void run_return() {
     }
 }
 
-int updata_file_2(Lend_Return lend) {
+int updata_file(Lend_Return lend) {
     //파일 수정
     FILE* file_user = fopen(USER_FILE, "r");
     FILE* file_temp = fopen(TEMP_FILE, "w");
@@ -146,11 +146,11 @@ int updata_file_2(Lend_Return lend) {
         title, author, bid, &isAvailable) == 4) {
         if (strcmp(bid, lend.bookBid) == 0) {
             // 이 사용자가 대상이면 수정된 정보로 기록
-            fprintf(file_temp1, "%s,%s,%s,%c\n", title, author, bid, 'Y');
+            fprintf_s(file_temp1, "%s,%s,%s,%c\n", title, author, bid, 'Y');
         }
         else {
             // 그 외 사용자는 그대로 복사
-            fprintf(file_temp1, "%s,%s,%s,%s,%c\n", title, author, bid, isAvailable);
+            fprintf_s(file_temp1, "%s,%s,%s,%s,%c\n", title, author, bid, isAvailable);
         }
     }
     fclose(file_books);

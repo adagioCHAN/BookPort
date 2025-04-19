@@ -1,9 +1,12 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
-#include "common.h"
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
+
+
+#include "common.h"
+
 
 bool update_file(const char* file_name, linked_list* list) {
 	FILE* fp = fopen(file_name, "w+");
@@ -23,11 +26,11 @@ bool update_file(const char* file_name, linked_list* list) {
 		}
 		else if (file_name == BOOK_FILE) {
 			book_data = (Book*)current->data;
-			fprintf(fp, "%s,%s,%s,%d\n", book_data->title, book_data->author, book_data->bid, book_data->isAvailable);
+			fprintf(fp, "%s,%s,%s,%c\n", book_data->title, book_data->author, book_data->bid, book_data->isAvailable);
 		}
 		else if (file_name == LEND_RETURN_FILE) {
 			borrow_data = (Lend_Return*)current->data;
-			fprintf(fp, "%s,%s,%s,%s,%d\n", borrow_data->userid, borrow_data->bookBid, borrow_data->borrowDate, borrow_data->returnDate, borrow_data->isOverdue);
+			fprintf(fp, "%s,%s,%s,%s,%c\n", borrow_data->userid, borrow_data->bookBid, borrow_data->borrowDate, borrow_data->returnDate, borrow_data->isOverdue);
 		}
 		current = current->next;
 	}
@@ -67,29 +70,36 @@ linked_list* read_user_data(bool* file_integrity) {
 		char* token = strtok(line, ",");
 		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
 		strcpy(data->name, token);
+
 		token = strtok(NULL, ",");
 		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
 		strcpy(data->studentId, token);
+
 		token = strtok(NULL, ",");
 		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
 		strcpy(data->password, token);
+
 		token = strtok(NULL, ",");
 		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
 		int idx = 0;
 		char tmp[1 << 10];
 		strcpy(tmp, token);
+
 		token = strtok(NULL, ",");
 		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
 		char* bid = strtok(tmp, ";");
+
 		while (bid != NULL) {
 			strcpy(data->lentBids[idx], bid);
 			bid = strtok(NULL, ";");
 			idx++;
 		}
+
 		data->lendAvailable = token[0] - '0';
 		insert_back(list, (void*)data);
 	}
 	fclose(fp);
+
 	if (*file_integrity) {
 		free(violation_lines);
 		return list;
@@ -133,9 +143,9 @@ linked_list* read_book_data(bool* file_integrity) {
 		free(violation_lines);
 		return list;
 	}
-	else {
+	else
 		return violation_lines;
-	}
+
 }
 
 linked_list* read_borrow_data(bool* file_integrity) {
@@ -214,7 +224,8 @@ void insert_front(linked_list* list, void* data, int type) {
 bool check_equality(void* data1, void* data2, int type) {
 	switch (type) {
 	case 1:
-		User * user_data1;
+	{
+		User* user_data1;
 		User* user_data2;
 		user_data1 = (User*)data1;
 		user_data2 = (User*)data2;
@@ -230,8 +241,10 @@ bool check_equality(void* data1, void* data2, int type) {
 			return false;
 		}
 		break;
+	}
 	case 2:
-		Book * book_data1;
+	{
+		Book* book_data1;
 		Book* book_data2;
 		book_data1 = (Book*)data1;
 		book_data2 = (Book*)data2;
@@ -239,8 +252,10 @@ bool check_equality(void* data1, void* data2, int type) {
 			return false;
 		}
 		break;
+	}
 	case 3:
-		Lend_Return * borrow_data1;
+	{
+		Lend_Return* borrow_data1;
 		Lend_Return* borrow_data2;
 		borrow_data1 = (Lend_Return*)data1;
 		borrow_data2 = (Lend_Return*)data2;
@@ -248,6 +263,7 @@ bool check_equality(void* data1, void* data2, int type) {
 			return false;
 		}
 		break;
+	}
 	}
 	return true;
 }

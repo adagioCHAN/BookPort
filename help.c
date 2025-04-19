@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <string.h>
 #include "common.h"
 
@@ -14,7 +14,7 @@ void run_help(const char* argument) {
         return;
     }
 
-    // ¼¼ºÎ µµ¿ò¸» Ãâ·Â
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     if (strcmp(canonical, "help") == 0)
         printf("help : Show help for all or a specific command\n");
     else if (strcmp(canonical, "quit") == 0)

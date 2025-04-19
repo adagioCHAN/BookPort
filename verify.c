@@ -51,7 +51,10 @@ int is_valid_student_id(const char* id) {
 
 int is_unique_student_id(const char* id) {
     FILE* file = fopen(USER_FILE, "r");
-    if (!file)  return 1;
+    if (!file) {
+        printf("[DEBUG] 사용자 파일 열기 실패: %s\n", USER_FILE);
+        return 1;
+    }
 
     char line[MAX_LINE];
     while (fgets(line, sizeof(line), file)) {
@@ -63,6 +66,13 @@ int is_unique_student_id(const char* id) {
 
         token = strtok(NULL, ",");
         if (token) strncpy(user.studentId, token, MAX_ID);
+
+        // 학번 검사 디버깅용
+        /*
+        printf("[DEBUG] 전달된 id: '%s'\n", id);
+        printf("[DEBUG] 파일에서 읽은 id: '%s'\n", user.studentId);
+        printf("[DEBUG] strcmp 결과: %d\n", strcmp(user.studentId, id));
+        */
 
         if (strcmp(user.studentId, id) == 0) {
             fclose(file);
@@ -92,17 +102,17 @@ int is_valid_password(const char* pw) {
 }
 
 int is_correct_password(const char* id, const char* pw) {
-    FILE* file = fopen("users.txt", "r");
-    User user = { 0 };
-    char password[MAX_PW];
-
-    if (!file)
+    FILE* file = fopen(USER_FILE, "r");
+    if (!file) {
+        printf("[DEBUG] 사용자 파일 열기 실패: %s\n", USER_FILE);
         return 0;
+    }
 
     char line[MAX_LINE];
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = 0;
 
+        User user;
         char* token = strtok(line, ",");
         if (token) strncpy(user.name, token, MAX_NAME);
 
@@ -112,6 +122,12 @@ int is_correct_password(const char* id, const char* pw) {
         if (strcmp(user.studentId, id) == 0) {
             token = strtok(NULL, ",");
             if (token) strncpy(user.password, token, MAX_PW);
+
+            // 비밀번호 디버깅용
+            /*
+            printf("[Debug] 비밀번호 확인: %s\n", user.password);
+            printf("[Debug] 입력된 비밀번호: %s\n", pw);
+            */
 
             if (strcmp(user.password, pw) == 0) {
                 fclose(file);
@@ -210,7 +226,7 @@ int is_valid_flag(const char* flag) {
 
 int is_meaningful_flag(const char* flag) {
     return flag && (strcmp(flag, "Y") == 0);
-} 
+}
 // 대출 가능 = 1, 대출 불가능 = 0
 
 // 대출/반납 정보 관련 함수
@@ -434,5 +450,3 @@ void run_verify() {
         exit(1);
     }
 }
-
-

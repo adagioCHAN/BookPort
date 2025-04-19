@@ -50,20 +50,31 @@ User register_user() {
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
-		int validResult = is_valid_student_id(buffer);
-		int uniqueResult = is_unique_student_id(buffer);
-        
-		// 학번 등록 및 오류 처리
+        int validResult = is_valid_student_id(buffer);
+        int uniqueResult = is_unique_student_id(buffer);
+
+        // 회원가입-학번입력 시 디버깅용
+        /*
+        fprintf(stderr, "[DEBUG] 입력된 학번: %s\n", buffer);
+
+        printf("[DEBUG] 유효성 검사 결과: %d\n", validResult);
+        fflush(stdout);
+
+        printf("[DEBUG] 중복 검사 결과: %d\n", uniqueResult);
+        fflush(stdout);
+
+        printf("[DEBUG] strlen(buffer) = %zu\n", strlen(buffer));
+        fflush(stdout);
+        */
+
+        // 학번 등록 및 오류 처리
         switch (validResult) {
-		case 0:
-			if (uniqueResult == 1) {
+        case 0:
+            if (uniqueResult == 1)
                 strncpy(new_user.studentId, buffer, MAX_ID);
-                break;
-			}
-            else if (uniqueResult == 0) {
+            else if (uniqueResult == 0)
                 printf(".!! Error: User information with the student ID you entered already exists\n");
-                break;
-            }
+            break;
         case 1:
             printf(".!! Error: Student ID cannot be an empty string.\n");
             break;
@@ -76,8 +87,8 @@ User register_user() {
         case 4:
             printf(".!! Error: Student ID cannot contain spaces.\n");
             break;
-		case 5:
-			printf(".!! Error: Student ID can only be entered in numbers.\n");
+        case 5:
+            printf(".!! Error: Student ID can only be entered in numbers.\n");
         case 6:
             printf(".!! Error: A student ID cannot consist of more than eight identical numbers.\n");
         default:
@@ -85,7 +96,7 @@ User register_user() {
             break;
         }
 
-        if (validResult == 0 && uniqueResult == 0)
+        if (validResult == 0 && uniqueResult == 1)
             break;
     }
 
@@ -122,18 +133,18 @@ User register_user() {
             break;
         }
 
-		if (validResult == 0)
-			break;
+        if (validResult == 0)
+            break;
     }
 
     // 회원가입 의사 확인
- 
+
     while (1) {
         printf("\nStudent ID: %s\n", new_user.studentId);
         printf("Password: %s\n", new_user.password);
         printf("Do you really want to sign up? (.../No) ");
-		fgets(buffer, sizeof(buffer), stdin);
-		buffer[strcspn(buffer, "\n")] = '\0';
+        fgets(buffer, sizeof(buffer), stdin);
+        buffer[strcspn(buffer, "\n")] = '\0';
 
         if (strcmp(buffer, "No") == 0) {
             printf("Account creation canceled.\n");
@@ -142,12 +153,12 @@ User register_user() {
         }
         else {
             for (int i = 0; i < 5; i++)
-				new_user.lentBids[i][0] = '\0'; // 대여한 책 BID 초기화
+                new_user.lentBids[i][0] = '\0'; // 대여한 책 BID 초기화
             new_user.lendAvailable = 5; // 대여 가능 권수 초기화
 
             printf("Account successfully created.\n");
             return new_user; // 성공적으로 생성된 사용자 구조체 반환
-         
+
         }
     }
 }

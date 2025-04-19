@@ -1,21 +1,21 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "common.h"
 #include "verify.h"
 
-#define TEMP_FILE "temp_user.txt"
 void run_borrow() {
     if (!is_logged_in) {
         printf("You must login first to borrow books.\n");
         return;
     }
-    /*if (current_user.lendAvailable <= 0) {
+    if (current_user.lendAvailable <= 0) {
         printf("You cannot borrow more books.\n");
         return;
-    }*/
-    int search_result = run_search(0);
+    }
+
     char bid_input[MAX_BID];
     Lend_Return lend;
 
@@ -23,16 +23,20 @@ void run_borrow() {
     linked_list* book_list = read_book_data(&book_integrity);
     if (!book_integrity) {
         print_list(book_list, 4);
-        return -1;
+        return;
     }
 
+    int search_result = run_search(0);
     node* current = book_list->head;
     while (1) {
-        if (search_result == 0) { run_search(0); }
-        if (search_result == 2) {
-            printf("Error: No available books found among the search results\n");
-            search_result = 0;
-            continue;
+        while (search_result == 0 || search_result == 2) {
+            if (search_result == 0) {
+                search_result = run_search(0);
+            }
+            if (search_result == 2) {
+                printf("Error: No available books found among the search results\n");
+                search_result = run_search(0);
+            }
         }
         printf("Enter BID of the book to borrow > ");
         fgets(bid_input, sizeof(bid_input), stdin);
@@ -62,21 +66,6 @@ void run_borrow() {
             }
             current = current->next;
         }
-        /* while (fscanf_s(file, "%49[^,],%29[^,],%104[^,],%c\n",
-             book.title, (unsigned)(sizeof(book.title)),
-             book.author, (unsigned)(sizeof(book.author)),
-             book.bid, (unsigned)(sizeof(book.bid)),
-             &status_char, 1) == 4) {
-             if (!strcmp(book.bid, bid_input)) {
-                 found=1;
-                 strcpy(lend.bookBid, book.bid);
-                 if (status_char != 'Y') {
-                     printf("Error: The book is already borrowed.\n");
-                     found=2;
-                 }
-                 break;
-             }
-         }*/
         if (found == 0) {
             printf("Error: No matching book found.\n");
             continue;
@@ -86,10 +75,6 @@ void run_borrow() {
         }
         break;
     }
-    //linked_list* user_list = read_user_data();
-    //node* current1 = user_list->head;
-    //linked_list* lend_list = read_borrow_data();
-    //node* current2 = lend_list->head;
 
     char loan_date[MAX_DATE];
     while (1)
@@ -113,84 +98,38 @@ void run_borrow() {
         printf("Borrowing cancelled.\n");
         return;
     }
+
+    // 1. Update book status
+    Book* book = find_by_bid(book_list, lend.bookBid);
+    if (book) {
+        book->isAvailable = 'N';
+    }
     update_file(BOOK_FILE, book_list);
-    return;
 
-    /*if (!update_file(USER_FILE,user_list)|| !update_file(BOOK_FILE,book_list)|| !update_file(LEND_RETURN_FILE,lend_list)) {
-        return;
-    }*/
-}
+    // 2. Update user data
+    bool user_integrity = true;
+    linked_list* user_list = read_user_data(&user_integrity);
+    User* user = find_by_userId(user_list, current_user.studentId);
+    if (user) {
+        strcpy(user->lentBids[5 - user->lendAvailable], lend.bookBid);
+        user->lendAvailable--;
+    }
+    update_file(USER_FILE, user_list);
+    printf("user data success");
 
-int updata_file(Lend_Return lend) {
-    //파일 수정
-    FILE* file_user = fopen(USER_FILE, "r");
-    FILE* file_temp = fopen(TEMP_FILE, "w");
+    // 3. Append to lend_return_data
+    bool lend_integrity = true;
+    linked_list* lend_list = read_borrow_data(&lend_integrity);
+    Lend_Return* new_lend = (Lend_Return*)malloc(sizeof(Lend_Return));
 
-    if (!file_user) {
-        printf("Cannot open file_user.\n");
-        return 0;
-    }
-    if (!file_temp) {
-        printf("user.\n");
-        return 0;
-    }
+    strcpy(new_lend->userid, current_user.studentId);
+    printf("DEBUG: lend.bookBid = '%s'\n", lend.bookBid);
+    strcpy(new_lend->bookBid, lend.bookBid);
+    strcpy(new_lend->borrowDate, lend.borrowDate);
+    strcpy(new_lend->returnDate, "");
+    new_lend->isOverdue = 'N';
+    insert_back(lend_list, new_lend);
+    update_file(LEND_RETURN_FILE, lend_list);
 
-    char name[100], studentId[20], password[20], bids[102];
-    int available;
-    char temp[102];
-    while (fscanf(file_user, "%99[^,],%19[^,],%19[^,],%101[^,],%d\n",
-        name, studentId, password, bids, &available) == 5) {
-        if (strcmp(studentId, current_user.studentId) == 0) {
-            // 이 사용자가 대상이면 수정된 정보로 기록
-            strcat(bids, ";");
-            strcat(bids, lend.bookBid);
-            fprintf(file_temp, "%s,%s,%s,%s,%d\n", name, studentId, password, bids, available - 1);
-        }
-        else {
-            // 그 외 사용자는 그대로 복사
-            fprintf(file_temp, "%s,%s,%s,%s,%d\n", name, studentId, password, bids, available);
-        }
-    }
-    fclose(file_user);
-    fclose(file_temp);
-    remove(USER_FILE);
-    if (rename(TEMP_FILE, USER_FILE) != 0) {
-        perror("rename BOOK_FILE");
-        return 0;
-    }
-    FILE* file_books = fopen(BOOK_FILE, "r");
-    FILE* file_temp1 = fopen(TEMP_FILE, "w");
-    if (!file_books || !file_temp1) {
-        printf("Cannot open file_books.\n");
-        return 0;
-    }
-    char title[50], author[30], bid[105];
-    char isAvailable;
-    while (fscanf(file_books, "%49[^,],%29[^,],%104[^,],%c\n",
-        title, author, bid, &isAvailable) == 4) {
-        if (strcmp(bid, lend.bookBid) == 0) {
-            // 이 사용자가 대상이면 수정된 정보로 기록
-            fprintf(file_temp1, "%s,%s,%s,%c\n", title, author, bid, 'N');
-        }
-        else {
-            // 그 외 사용자는 그대로 복사
-            fprintf(file_temp1, "%s,%s,%s,%c\n", title, author, bid, isAvailable);
-        }
-    }
-    fclose(file_books);
-    fclose(file_temp1);
-    remove(BOOK_FILE);
-    if (rename(TEMP_FILE, BOOK_FILE) != 0) {
-        perror("rename BOOK_FILE");
-        return 0;
-    }
-    FILE* file_lend = fopen(LEND_RETURN_FILE, "a");
-    if (!file_lend) {
-        printf("Cannot open file_lend.\n");
-        return 0;
-    }
-    fprintf(file_lend, "\n%s,%s,%s,%s,%c", current_user.studentId, lend.bookBid, lend.borrowDate, "0", 'N');
-    fclose(file_lend);
-
-    return 1;
+    printf("\nBook successfully borrowed!\n");
 }
