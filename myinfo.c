@@ -174,10 +174,10 @@ void run_change() {
 			switch (result) {
 			case 1: printf(".!! Error: Password cannot be an empty string.\n"); break;
 			case 2: printf(".!! Error: Password must be 5 to 20 characters long.\n"); break;
-			case 3: printf(".!! Error: Password cannot contain whitespace.\n"); break;
-			case 4: printf(".!! Error: Repeated characters over limit.\n"); break;
+			case 3: printf(".!! Error: Password cannot contain spaces\n"); break;
+			case 4: printf(".!! Error: The password cannot contain 5 or more of the same letter, digit, or special character.\n"); break;
 			case 5: printf(".!! Error: Password must be at least 1 character long and include at least 1 digit\n"); break;
-			default: printf(".!! Error: Invalid password format.\n"); break;
+			default: printf(".!! Error: An unknown error occured\n"); break;
 			}
 			continue;
 		}
@@ -268,7 +268,7 @@ void run_myinfo() {
 		char input[100];
 
 		while (1) {
-			printf("BookPort: My info - Enter command>");
+			printf("BookPort: My info - Enter command >");
 			if (!fgets(input, sizeof(input), stdin)) break;
 			trim(input);
 
