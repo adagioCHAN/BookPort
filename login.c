@@ -60,14 +60,14 @@ User get_user_by_id(const char* id) {
 }
 
 User login_user() {
-    char buffer[101];
+    char buffer[200];
     char studentId[MAX_ID];
     char password[MAX_PW];
     User user = { 0 };
 
     // 학번 입력
     while (1) {
-        printf("Enter student ID ");
+        printf("Enter student ID >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
@@ -135,9 +135,9 @@ User login_user() {
 
     // 비밀번호 입력
     while (1) {
-        printf("Enter password ");
+        printf("Enter password >");
         fgets(buffer, sizeof(buffer), stdin);
-        buffer[strcspn(buffer, "\n")] = '\0';
+        buffer[strcspn(buffer, "\n")] = 0;
 
         int validResult = is_valid_password(buffer);
         int correctResult = is_correct_password(studentId, buffer);
@@ -195,11 +195,11 @@ User login_user() {
     while (1) {
         printf("\nStudent ID: %s\n", studentId);
         printf("Password: %s\n", password);
-        printf("Are you sure you want to login? (.../No) ");
+        printf("Are you sure you want to login? (.../No) >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
-        if (strcmp(buffer, "No") == 0)
+        if (check_input(buffer) == 0)
             return user; // 빈 사용자 구조체 반환
         else {
             user = get_user_by_id(studentId);

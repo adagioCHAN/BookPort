@@ -19,6 +19,9 @@ int is_unique_student_id(const char* id);						// 학번 중복 확인
 int is_valid_password(const char* pw);							// 문법 규칙
 int is_correct_password(const char* id, const char* pw);		// 올바른 pw 확인
 
+// 의사 확인
+int check_input(const char* str);
+
 //	대출 가능 도서 개수 검사
 int is_valid_lendavailable(const int* lendAvailable);			// 문법 규칙
 
