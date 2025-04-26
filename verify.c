@@ -17,32 +17,35 @@ int is_valid_student_name(const char* name) {
     if (len < 1 || len > 100) return 2;
     for (int i = 0; i < len; i++) {
         unsigned char ch = name[i];
-
+        if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')) continue;
+        else return 3;
         if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'))
             continue;  // 영어 알파벳 OK
         else if (isspace(ch))
             if (ch != ' ') return 4;  // 스페이스바 공백만 허용
-        else
-            return 3;  // 알파벳도 아니고 공백도 아님 → 외국어/기호 등
     }
 
     return 0;
 }
 
 int is_valid_student_id(const char* id) {
-    if (!id) return 1;
-    if (strlen(id) != 9) return 2;
+    int len = strlen(id);
+    if (len == 0) return 1;
     if (id[0] == '0') return 3;
 
     int count[10] = { 0 };
-    for (int i = 0; i < 9; i++) {
-        if (id[i] == ' ') return 4;
-        if (!isdigit(id[i])) return 5;
+    for (int i = 0; i < len; i++) {
+        unsigned char ch = id[i];
+        if (isspace(ch)) return 4;
+        else if (!isdigit(ch)) return 5;
 
         count[id[i] - '0']++;
     }
 
-    for (int i = 0; i < 10; i++) if (count[i] >= 8) return 6;
+    if (len != 9) return 2;
+    for (int i = 0; i < 10; i++) {
+        if (count[i] >= 8) return 6;
+    }
 
     return 0;
 }
@@ -84,19 +87,23 @@ int is_unique_student_id(const char* id) {
 
 int is_valid_password(const char* pw) {
     int len = strlen(pw);
-    if (!pw) return 1;
-    if (len < 5 || len > 20) return 2;
+    if (len == 0) return 1;
 
     int has_alpha = 0, has_digit = 0, freq[256] = { 0 };
     for (int i = 0; i < len; i++) {
-        if (isspace(pw[i])) return 3;
-        if (isalpha(pw[i])) has_alpha = 1;
-        if (isdigit(pw[i])) has_digit = 1;
-        if (++freq[(unsigned char)pw[i]] >= 5) return 4;
+        unsigned char ch = pw[i];
+        if (ch >= 128) return 6;
+        if (isspace(ch)) return 3;
+        if (isalpha(ch)) has_alpha = 1;
+        if (isdigit(ch)) has_digit = 1;
+        if (++freq[ch] >= 5) return 4;
     }
 
-    if (has_alpha == 1 && has_digit == 1) return 0;
-    else return 5;
+
+    if (has_alpha != 1 || has_digit != 1) return 5;
+    if (len < 5 || len > 20) return 2;
+
+    return 0;
 }
 
 int is_correct_password(const char* id, const char* pw) {
@@ -144,6 +151,15 @@ int is_correct_password(const char* id, const char* pw) {
 
 int is_valid_lendavailable(const int* lendAvailable) {
     return *lendAvailable >= 0 && *lendAvailable <= 5;
+}
+
+int check_input(const char* str) {
+    if (strlen(str) == 2) {
+        if ((str[0] == 'n' || str[0] == 'N') &&
+            (str[1] == 'o' || str[1] == 'O')) return 0;
+    }
+    else return 1;
+
 }
 
 
