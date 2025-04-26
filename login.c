@@ -67,7 +67,7 @@ User login_user() {
 
     // 학번 입력
     while (1) {
-        printf("Enter student ID >");
+        printf("BookPort: Enter student ID >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
@@ -135,7 +135,7 @@ User login_user() {
 
     // 비밀번호 입력
     while (1) {
-        printf("Enter password >");
+        printf("BookPort: Enter password >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = 0;
 
@@ -186,16 +186,14 @@ User login_user() {
                 continue;
             }
         }
-
-
     }
 
 
     // 로그인 의사 확인
     while (1) {
-        printf("\nStudent ID: %s\n", studentId);
-        printf("Password: %s\n", password);
-        printf("Are you sure you want to login? (.../No) >");
+        printf("\n⇒ Student ID: %s\n", studentId);
+        printf("  Password: %s\n", password);
+        printf("BookPort: Are you sure you want to login? (.../No) >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
@@ -206,4 +204,5 @@ User login_user() {
             return user; // 성공적으로 생성된 사용자 구조체 반환
         }
     }
+
 }

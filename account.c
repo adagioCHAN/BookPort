@@ -12,7 +12,7 @@ User register_user() {
 
     // 이름 입력
     while (1) {
-        printf("Enter name >");
+        printf("BookPort: Enter name >");
         fgets(buffer, sizeof(buffer), stdin);               // 이름 입력
         buffer[strcspn(buffer, "\n")] = 0;
 
@@ -45,7 +45,7 @@ User register_user() {
 
     // 학번 입력
     while (1) {
-        printf("Enter student ID >");
+        printf("BookPort: Enter student ID >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = 0;
 
@@ -103,7 +103,7 @@ User register_user() {
 
     // 비밀번호 입력
     while (1) {
-        printf("Enter password >");
+        printf("BookPort: Enter password >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
@@ -144,9 +144,9 @@ User register_user() {
     // 회원가입 의사 확인
 
     while (1) {
-        printf("\nStudent ID: %s\n", new_user.studentId);
-        printf("Password: %s\n", new_user.password);
-        printf("Do you really want to sign up? (.../No) >");
+        printf("\n⇒ Student ID: %s\n", new_user.studentId);
+        printf("   Password: %s\n", new_user.password);
+        printf("BookPort: Do you really want to sign up? (.../No) >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
