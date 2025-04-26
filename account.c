@@ -8,11 +8,11 @@
 
 User register_user() {
     User new_user = { 0 };
-    char buffer[101];
+    char buffer[200];
 
     // 이름 입력
     while (1) {
-        printf("BookPort: Enter name >");
+        printf("Enter name >");
         fgets(buffer, sizeof(buffer), stdin);               // 이름 입력
         buffer[strcspn(buffer, "\n")] = 0;
 
@@ -45,9 +45,9 @@ User register_user() {
 
     // 학번 입력
     while (1) {
-        printf("BookPort: Enter student ID >");
+        printf("Enter student ID >");
         fgets(buffer, sizeof(buffer), stdin);
-        buffer[strcspn(buffer, "\n")] = '\0';
+        buffer[strcspn(buffer, "\n")] = 0;
 
         int validResult = is_valid_student_id(buffer);
         int uniqueResult = is_unique_student_id(buffer);
@@ -88,8 +88,10 @@ User register_user() {
             break;
         case 5:
             printf(".!! Error: Student ID can only be entered in numbers.\n");
+            break;
         case 6:
             printf(".!! Error: A student ID cannot consist of more than eight identical numbers.\n");
+            break;
         default:
             printf(".!! Error: An unknown error occured.\n");
             break;
@@ -101,7 +103,7 @@ User register_user() {
 
     // 비밀번호 입력
     while (1) {
-        printf("BookPort: Enter password >");
+        printf("Enter password >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
@@ -127,6 +129,9 @@ User register_user() {
         case 5:
             printf(".!! Error: Password must be at least 1 character long and include at least 1 digit\n");
             break;
+        case 6:
+            printf(".!! Error: Password input can only be used in English, numbers, and special characters (ASCII standard characters only)\n");
+            break;
         default:
             printf(".!! Error: An unknown error occured\n");
             break;
@@ -141,11 +146,11 @@ User register_user() {
     while (1) {
         printf("\nStudent ID: %s\n", new_user.studentId);
         printf("Password: %s\n", new_user.password);
-        printf("Do you really want to sign up? (.../No) ");
+        printf("Do you really want to sign up? (.../No) >");
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = '\0';
 
-        if (strcmp(buffer, "No") == 0) {
+        if (check_input(buffer) == 0) {
             printf("Account creation canceled.\n");
             User empty_user = { 0 };
             return empty_user; // 빈 사용자 구조체 반환
