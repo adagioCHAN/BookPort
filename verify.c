@@ -1,4 +1,5 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -195,19 +196,33 @@ int is_valid_book_author(const char* author) {
 }
 
 int is_valid_bid(const char* bid) {
+    if (bid == NULL || strlen(bid) == 0) return 7;  // NULL 또는 빈 문자열
+
     int len = strlen(bid);
-    if (len < 1) return 0;
 
+    // (1) 전체가 공백류로만 구성되었는지 검사
+    int all_space = 1;
     for (int i = 0; i < len; i++) {
-        if (isspace((unsigned char)bid[i]) && bid[i] != ' ')
-            return 0;
+        if (bid[i] != ' ' && bid[i] != '\t' && bid[i] != '\n' && bid[i] != '\r') {
+            all_space = 0;
+            break;
+        }
+    }
+    if (all_space) return 8; // 전부 공백류
 
-        if (!isalnum((unsigned char)bid[i]) && bid[i] != '-' && bid[i] != '.' && bid[i] != ':')
-            return 0;
+    // (2) 문자 중간에 공백류가 들어갔는지 검사
+    for (int i = 0; i < len; i++) {
+        if (bid[i] == ' ' || bid[i] == '\t' || bid[i] == '\n' || bid[i] == '\r') {
+            return 9;  // 문자 사이에 공백류 끼어 있음
+        }
+        if (!isalnum((unsigned char)bid[i]) && bid[i] != '-' && bid[i] != '.' && bid[i] != ':') {
+            return 0;  // 형식에 맞지 않은 문자 포함 
+        }
     }
 
-    return 1;
+    return 1;  // 정상 BID
 }
+
 
 int is_unique_bid(const char* bid) {
     FILE* file = fopen(BOOK_FILE, "r");
@@ -243,31 +258,64 @@ int is_meaningful_flag(const char* flag) {
 }
 // 대출 가능 = 1, 대출 불가능 = 0
 
-// 대출/반납 정보 관련 함수
 int is_valid_date(const char* date) {
-    if (!date) return 0;
+    if (date == NULL || strlen(date) == 0) return 10;  // 빈 문자열
 
-    char clean[9] = { 0 };
-    int y, m, d;
+    int len = strlen(date);
 
-    if (
-        sscanf(date, "%4d/%2d/%2d", &y, &m, &d) == 3 ||
-        sscanf(date, "%4d-%2d-%2d", &y, &m, &d) == 3 ||
-        (sscanf(date, "%8s", clean) == 1 && sscanf(clean, "%4d%2d%2d", &y, &m, &d) == 3)
-        ) {
-        if (y < 1900 || y > 2100 || m < 1 || m > 12) return 0;
-
-        int day_in_month[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
-        if (m == 2 && ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0))) {
-            day_in_month[1] = 29;  // 윤년
+    // (1) 전체가 공백류인지 확인
+    int all_space = 1;
+    for (int i = 0; i < len; i++) {
+        if (date[i] != ' ' && date[i] != '\t' && date[i] != '\n' && date[i] != '\r') {
+            all_space = 0;
+            break;
         }
+    }
+    if (all_space) return 11;
 
-        if (d < 1 || d > day_in_month[m - 1]) return 0;
-
-        return 1;
+    // (2) 문자열 중간에 공백류가 있으면
+    for (int i = 0; date[i] != '\0'; i++) {
+        if (date[i] == ' ' || date[i] == '\t' || date[i] == '\n' || date[i] == '\r') {
+            return 12;  // 중간에 공백류
+        }
     }
 
-    return 0;
+    int y, m, d;
+
+    if (len == 10) {
+        // 형식: YYYY/MM/DD or YYYY-MM-DD
+        if ((date[4] != '/' && date[4] != '-') || (date[7] != '/' && date[7] != '-')) {
+            return 0; // 형식 오류
+        }
+        if (sscanf(date, "%4d%*c%2d%*c%2d", &y, &m, &d) != 3) {
+            return 0; // 형식 오류
+        }
+    }
+    else if (len == 8) {
+        // 형식: YYYYMMDD
+        if (sscanf(date, "%4d%2d%2d", &y, &m, &d) != 3) {
+            return 0; // 형식 오류
+        }
+    }
+    else {
+        return 0; // 형식 오류 (길이 이상)
+    }
+
+    // (3) 날짜 유효성 검사
+    if (y < 1900 || y > 2100 || m < 1 || m > 12) {
+        return 13;
+    }
+
+    int day_in_month[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+    if (m == 2 && ((y % 4 == 0 && y % 100 != 0) || (y % 400 == 0))) {
+        day_in_month[1] = 29; // 윤년
+    }
+
+    if (d < 1 || d > day_in_month[m - 1]) {
+        return 13;
+    }
+
+    return 1;  // 정상
 }
 
 
@@ -439,12 +487,13 @@ void run_verify() {
                 error_count++;
             }
 
-            int return_result = is_valid_date(lr->returnDate);
-            if (return_result != 1) {
-                printf(" - Invalid returnDate: %s (code=%d)\n", lr->returnDate, return_result);
-                error_count++;
+            if (strcmp(lr->returnDate, ",") == 0) {
+                int return_result = is_valid_date(lr->returnDate);
+                if (return_result != 1) {
+                    printf(" - Invalid returnDate: %s (code=%d)\n", lr->returnDate, return_result);
+                    error_count++;
+                }
             }
-
 
             if (!is_valid_overdue(lr->isOverdue ? "Y" : "N")) {
                 printf(" - Invalid overdue flag: %d\n", lr->isOverdue);
@@ -460,7 +509,6 @@ void run_verify() {
         printf(">>> All files are valid.\n");
     }
     else {
-        printf(">>> A total of %d error(s) found. Terminating program.\n", error_count);
         exit(1);
     }
 }

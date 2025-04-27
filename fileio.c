@@ -13,20 +13,23 @@ bool update_file(const char* file_name, linked_list* list) {
 	Lend_Return* borrow_data;
 	node* current = list->head;
 	while (current != NULL) {
-		if (file_name == USER_FILE) {
+		if (strcmp(file_name, USER_FILE) == 0) {
 			user_data = (User*)current->data;
 			fprintf(fp, "%s,%s,%s", user_data->name, user_data->studentId, user_data->password);
 			for (int i = 0; i < 5 - user_data->lendAvailable; i++) {
 				if (i == 0)fprintf(fp, ",%s", user_data->lentBids[i]);
 				else fprintf(fp, ";%s", user_data->lentBids[i]);
 			}
+			if (user_data->lendAvailable == 5) {
+				fprintf(fp, ",");
+			}
 			fprintf(fp, ",%d\n", user_data->lendAvailable);
 		}
-		else if (file_name == BOOK_FILE) {
+		else if (strcmp(file_name, BOOK_FILE) == 0) {
 			book_data = (Book*)current->data;
 			fprintf(fp, "%s,%s,%s,%c\n", book_data->title, book_data->author, book_data->bid, book_data->isAvailable);
 		}
-		else if (file_name == LEND_RETURN_FILE) {
+		else if (strcmp(file_name, LEND_RETURN_FILE) == 0) {
 			borrow_data = (Lend_Return*)current->data;
 			fprintf(fp, "%s,%s,%s,%s,%c\n", borrow_data->userid, borrow_data->bookBid, borrow_data->borrowDate, borrow_data->returnDate, borrow_data->isOverdue);
 		}
@@ -36,18 +39,26 @@ bool update_file(const char* file_name, linked_list* list) {
 	return true;
 }
 
-bool check_empty(char* token, bool* file_integrity) {
-	if (token == NULL) {
-		*file_integrity = false;
-		return true;
-	}
-	else return false;
-}
-
 void add_violation_line(linked_list* list, char* line) {
 	char* str = (char*)malloc(strlen(line) + 1);
 	strcpy(str, line);
 	insert_back(list, (void*)str);
+}
+
+char* strsep(char** stringp, const char* delim) {
+	char* start = *stringp;
+	if (start == NULL) return NULL;
+
+	char* end = strpbrk(start, delim);
+	if (end) {
+		*end = '\0';
+		*stringp = end + 1;
+	}
+	else {
+		*stringp = NULL;
+	}
+
+	return start;
 }
 
 linked_list* read_user_data(bool* file_integrity) {
@@ -55,6 +66,7 @@ linked_list* read_user_data(bool* file_integrity) {
 	linked_list* violation_lines = (linked_list*)calloc(1, sizeof(linked_list));
 	FILE* fp = fopen(USER_FILE, "r");
 	char line[1 << 10];
+	char* rest = line;
 	char line_copy[1 << 10];
 	if (fp == NULL) {
 		fp = fopen(USER_FILE, "w+");
@@ -63,33 +75,35 @@ linked_list* read_user_data(bool* file_integrity) {
 	}
 	while (fgets(line, sizeof(line), fp)) {
 		strcpy(line_copy, line);
+		rest = line;
 		User* data = (User*)calloc(1, sizeof(User));
 		line[strcspn(line, "\n")] = 0;
-		char* token = strtok(line, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		char* token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->name, token);
 
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->studentId, token);
 
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->password, token);
 
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		int idx = 0;
 		char tmp[1 << 10];
+		char* tmp_p = tmp;
 		strcpy(tmp, token);
 
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { /*add_violation_line(violation_lines, line_copy); */ *file_integrity = true;  continue; }
-		char* bid = strtok(tmp, ";");
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
+		char* bid = strsep(&tmp_p, ";");
 
 		while (bid != NULL) {
 			strcpy(data->lentBids[idx], bid);
-			bid = strtok(NULL, ";");
+			bid = strsep(&tmp_p, ";");
 			idx++;
 		}
 
@@ -112,6 +126,7 @@ linked_list* read_book_data(bool* file_integrity) {
 	linked_list* violation_lines = (linked_list*)calloc(1, sizeof(linked_list));
 	FILE* fp = fopen(BOOK_FILE, "r");
 	char line[1 << 10];
+	char* rest;
 	char line_copy[1 << 10];
 	if (fp == NULL) {
 		fp = fopen(BOOK_FILE, "w+");
@@ -120,19 +135,20 @@ linked_list* read_book_data(bool* file_integrity) {
 	}
 	while (fgets(line, sizeof(line), fp)) {
 		strcpy(line_copy, line);
+		rest = line;
 		Book* data = (Book*)calloc(1, sizeof(Book));
 		line[strcspn(line, "\n")] = 0;
-		char* token = strtok(line, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		char* token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->title, token);
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->author, token);
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->bid, token);
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		data->isAvailable = token[0];
 		insert_back(list, (void*)data);
 	}
@@ -151,6 +167,7 @@ linked_list* read_borrow_data(bool* file_integrity) {
 	linked_list* violation_lines = (linked_list*)calloc(1, sizeof(linked_list));
 	FILE* fp = fopen(LEND_RETURN_FILE, "r");
 	char line[1 << 10];
+	char* rest = line;
 	char line_copy[1 << 10];
 	if (fp == NULL) {
 		fp = fopen(LEND_RETURN_FILE, "w+");
@@ -159,22 +176,23 @@ linked_list* read_borrow_data(bool* file_integrity) {
 	}
 	while (fgets(line, sizeof(line), fp)) {
 		strcpy(line_copy, line);
+		rest = line;
 		Lend_Return* data = (Lend_Return*)calloc(1, sizeof(Lend_Return));
 		line[strcspn(line, "\n")] = 0;
-		char* token = strtok(line, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		char* token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->userid, token);
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->bookBid, token);
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->borrowDate, token);
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { add_violation_line(violation_lines, line_copy); continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		strcpy(data->returnDate, token);
-		token = strtok(NULL, ",");
-		if (check_empty(token, file_integrity)) { /*add_violation_line(violation_lines, line_copy);*/ *file_integrity = true; continue; }
+		token = strsep(&rest, ",");
+		if (token == NULL) { add_violation_line(violation_lines, line_copy); *file_integrity = false; continue; }
 		data->isOverdue = token[0];
 		insert_back(list, (void*)data);
 	}
@@ -424,6 +442,9 @@ void print_list(linked_list* list, int type) {
 			for (int i = 0; i < 5 - user_data->lendAvailable; i++) {
 				if (i == 0)printf("%s", user_data->lentBids[i]);
 				else printf(";%s", user_data->lentBids[i]);
+			}
+			if (user_data->lendAvailable == 5) {
+				printf(",");
 			}
 			printf(",%d\n", user_data->lendAvailable);
 		}

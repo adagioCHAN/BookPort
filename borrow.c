@@ -42,12 +42,27 @@ void run_borrow() {
         }
         printf("Enter BID of the book to borrow > ");
         fgets(bid_input, sizeof(bid_input), stdin);
-        trim(bid_input);
+        bid_input[strcspn(bid_input, "\n")] = '\0';
+
+        int error_check = -1;
 
         // BID 유효성 검사
-        if (!is_valid_bid(bid_input)) {
+        if (is_valid_bid(bid_input) == 7) {
+            printf(".!! Error: BID cannot be an empty string\n");
             continue;
         }
+
+        if (is_valid_bid(bid_input) == 8) {
+            printf(".!! Error: BID cannot consist of only whitespace characters\n");
+            continue;
+        }
+
+        if (is_valid_bid(bid_input) == 9) {
+            printf(".!! Error: A tab character cannot be placed between the first and last valid characters of the BID\n");
+            continue;
+        }
+
+        trim(bid_input);
         // 검색된 책 중 BID 일치 여부 확인
         int found = 0;
         printf("\n[Search BID Result]\n");
@@ -79,14 +94,44 @@ void run_borrow() {
     }
 
     char loan_date[MAX_DATE];
+
     while (1)
     {
         printf("Enter loan date > ");
-        fgets(loan_date, sizeof(loan_date), stdin);
-        trim(loan_date);
-        if (!is_valid_date(loan_date)) {
+
+        if (fgets(loan_date, sizeof(loan_date), stdin) == NULL) {
+            printf("Input error!\n");
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
             continue;
         }
+
+        // fgets는 줄바꿈('\n')을 포함할 수 있으므로 제거
+        loan_date[strcspn(loan_date, "\n")] = '\0';
+
+        // 버퍼 초과 방지: 입력이 가득 찼는데 줄바꿈 없으면 추가로 비워준다
+        if (strlen(loan_date) == sizeof(loan_date) - 1 && loan_date[sizeof(loan_date) - 2] != '\n') {
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
+        }
+
+        if (is_valid_date(loan_date) == 10) {
+            printf(".!! Error: Loan date cannot be an empty string\n");
+            continue;
+        }
+        if (is_valid_date(loan_date) == 11) {
+            printf(".!! Error: Loan date cannot consist of only whitespace characters\n");
+            continue;
+        }
+        if (is_valid_date(loan_date) == 12) {
+            printf(".!! Error: A tab Character cannot be placed between the first and last valid characters of the loan date.\n");
+            continue;
+        }
+        if (is_valid_date(loan_date) == 13) {
+            printf(".!! Error: The date must exist in the Gregorian calendar\n");
+            continue;
+        }
+        trim(loan_date);
         strcpy(lend.borrowDate, loan_date);
         break;
     }
@@ -125,7 +170,7 @@ void run_borrow() {
     Lend_Return* new_lend = (Lend_Return*)malloc(sizeof(Lend_Return));
 
     strcpy(new_lend->userid, current_user.studentId);
-    printf("DEBUG: lend.bookBid = '%s'\n", lend.bookBid);
+    //printf("DEBUG: lend.bookBid = '%s'\n", lend.bookBid);
     strcpy(new_lend->bookBid, lend.bookBid);
     strcpy(new_lend->borrowDate, lend.borrowDate);
     strcpy(new_lend->returnDate, "");
