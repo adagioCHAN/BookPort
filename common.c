@@ -5,10 +5,8 @@
 
 #include "common.h"
 #include "verify.h"
-#include "function.h"
 
-// 로그인 여부 판단
-int is_logged_in = 1; // 로그인 시 1
+int is_logged_in = 0;
 User current_user = { 0 };
 
 void run_login() {
@@ -30,18 +28,29 @@ void run_login() {
 void run_account() {
     if (is_logged_in == 1)
         printf(".!! You are already logged in.\n");
-    
+
     else {
-		User user = register_user();
+        User user = register_user();
         if (user.studentId[0] != '\0') {
             FILE* file = fopen("users_data.txt", "a");
+
             if (file == NULL)
                 printf(".!! Error: Failed to open file.\n");
             else {
                 char lentBidsInfo[MAX_BID] = "";
+                
+                int hasValue = 0;
+
                 for (int i = 0; i < 5; i++) {
-                    strcat(lentBidsInfo, user.lentBids[i]);
-                    if (i < 4) strcat(lentBidsInfo, ";");
+                    if (strlen(user.lentBids[i]) > 0) {
+                        if (hasValue) strcat(lentBidsInfo, ";");
+                        strcat(lentBidsInfo, user.lentBids[i]);
+                        hasValue = 1;
+                    }
+                }
+
+                if (strlen(lentBidsInfo) == 0) {
+                    strcpy(lentBidsInfo, "");
                 }
 
                 fprintf(file, "%s,%s,%s,%s,%d\n",
@@ -51,21 +60,20 @@ void run_account() {
                     lentBidsInfo,
                     user.lendAvailable
                 );
+
+                fclose(file);
             }
 
-            fclose(file);
         }
     }
 }
 
 void run_logout() {
-	if (is_logged_in == 0)
-		printf("....Cannot logout because you are not logged in\n");
-
-	else {
-		is_logged_in = 0;
-		current_user = (User){ 0 };
-		printf("...Logout completed\n");
-	}
+    if (is_logged_in == 0)
+        printf("....Cannot logout because you are not logged in\n");
+    else {
+        is_logged_in = 0;
+        current_user = (User){ 0 };
+        printf("...Logout completed\n");
+    }
 }
-

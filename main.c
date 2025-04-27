@@ -29,15 +29,15 @@ char* get_canonical_command(char* input) {
         const char* synonyms[20];
         const char* canonical;
     } cmd_table[] = {
-        { { "?", "help", "hel", "he", "h" }, "help" },
-        { { ".", "quit" }, "quit" },
-        { { "!", "verify", "verif", "ver", "v" }, "verify" },
-        { { "a", "account", "accoun", "acc", "ac" }, "account" },
-        { { "in", "login", "logi", "logo", "i" }, "login" },
-        { { "out", "logout", "logou", "ou", "o" }, "logout" },
-        { { "/", "search", "searc", "se", "sea", "s" }, "search" },
+        { { "?", "Help", "Hel", "He", "h" }, "Help" },
+        { { ".", "quit", "qui", "qu", "q"}, "quit"},
+        { { "!", "verify", "verif", "veri", "ver", "ve", "v"}, "verify"},
+        { { "a", "account", "accoun", "accou", "acco", "acc", "ac" }, "account" },
+        { { "in", "login", "logi", "i" }, "login" },
+        { { "out", "logout", "logou", "logo", "ou", "o" }, "logout" },
+        { { "/", "search", "searc", "sear", "se", "sea", "s" }, "search" },
         { { "$", "borrow", "borro", "borr", "bor", "bo", "b" }, "borrow" },
-        { { "r", "return", "retur", "ret", "re" }, "return" },
+        { { "r", "return", "retur", "retu", "ret", "re" }, "return" },
         { { "info", "myinfo", "myinf", "myin", "myi", "my", "m" }, "myinfo" }
     };
 
@@ -91,9 +91,9 @@ int main() {
         char* extra = strtok_s(NULL, " \t\n", &context);
 
         // help
-        if (strcmp(cmd, "help") == 0) {
+        if (strcmp(cmd, "Help") == 0) {
             if (extra != NULL) {
-                printf("Error: Too many arguments. Please enter only one command at a time.\n");
+                printf(".!! Error: Too many arguments. Please enter only one command at a time.\n");
                 print_command_usage();
                 continue;
             }
@@ -111,13 +111,12 @@ int main() {
             strcmp(cmd, "myinfo") == 0) {
 
             if (argument != NULL || extra != NULL) {
-                printf("Error: No arguments should be provided.\n");
+                printf(".!! Error: No arguments should be provided.\n");
                 continue;
             }
 
             // ¿¬°á
             if (strcmp(cmd, "quit") == 0) {
-                printf("Exiting program...\n");
                 break;
             }
 
@@ -128,7 +127,7 @@ int main() {
             else if (strcmp(cmd, "search") == 0) run_search(1);
             else if (strcmp(cmd, "borrow") == 0) run_borrow();
             else if (strcmp(cmd, "return") == 0) run_return();
-            //else if (strcmp(cmd, "myinfo") == 0) run_myinfo();
+            else if (strcmp(cmd, "myinfo") == 0) run_myinfo();
         }
     }
 

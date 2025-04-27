@@ -1,20 +1,13 @@
 #define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "common.h"
 #include "verify.h"
 
 void run_borrow() {
-    if (!is_logged_in) {
-        printf("You must login first to borrow books.\n");
-        return;
-    }
-    if (current_user.lendAvailable <= 0) {
-        printf("You cannot borrow more books.\n");
-        return;
-    }
-
     char bid_input[MAX_BID];
     Lend_Return lend;
 
@@ -26,6 +19,16 @@ void run_borrow() {
     }
 
     int search_result = run_search(0);
+
+    if (!is_logged_in) {
+        run_login();
+        return;
+    }
+    if (current_user.lendAvailable <= 0) {
+        printf("You cannot borrow more books.\n");
+        return;
+    }
+
     node* current = book_list->head;
     while (1) {
         while (search_result == 0 || search_result == 2) {

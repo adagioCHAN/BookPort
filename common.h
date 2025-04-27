@@ -10,29 +10,25 @@
 #define MAX_TITLE 50
 #define MAX_AUTHOR 50
 #define MAX_BID 50
-
 #define MAX_DATE 11
 
-// ���� ���
-#define USER_FILE "users_data.txt"             // ����� ���� ����
-#define BOOK_FILE "books_data.txt"             // ���� ���� ����
-#define LEND_RETURN_FILE "lend_return_data.txt" // �뿩 ���� ����
+#define USER_FILE "users_data.txt"             
+#define BOOK_FILE "books_data.txt"             
+#define LEND_RETURN_FILE "lend_return_data.txt" 
 
-// ����� ����ü
 typedef struct {
-    char name[MAX_NAME];                      // �̸�
-    char studentId[MAX_ID];                  // �й�
-    char password[MAX_PW];                   // ��й�ȣ
-    char lentBids[5][MAX_BID];               // �뿩�� å BID �ִ� 5�� (';' ���� �迭�� ó��)
-    int lendAvailable;                       // �뿩 ���� �Ǽ�
+    char name[MAX_NAME];                  
+    char studentId[MAX_ID];              
+    char password[MAX_PW];                 
+    char lentBids[5][MAX_BID];              
+    int lendAvailable;                  
 } User;
 
-// ���� ����ü
 typedef struct {
-    char title[MAX_TITLE];                   // ����
-    char author[MAX_AUTHOR];                 // ����
-    char bid[MAX_BID];                       // ���� ���� BID
-    char isAvailable;                         // �뿩 ���� ���� ("Y": ���� ����, "N": ���� �Ұ���)
+    char title[MAX_TITLE];                 
+    char author[MAX_AUTHOR];              
+    char bid[MAX_BID];                   
+    char isAvailable;                       
 } Book;
 
 typedef struct node {
@@ -65,20 +61,17 @@ Book* find_by_title(linked_list* list, const char* title);
 bool check_empty(char* token, bool* file_integrity);
 void add_violation_line(linked_list* list, char* line);
 
-// ����/�ݳ� ����ü
 typedef struct {
-    char userid[MAX_ID];                     // ����� �й�
-    char bookBid[MAX_BID];                   // ���� BID
-    char borrowDate[MAX_DATE];               // ������ (yyyy-mm-dd)
-    char returnDate[MAX_DATE];               // �ݳ��� (yyyy-mm-dd)
-    char isOverdue;                           // ��ü ���� (0: ����, 1: ��ü)
+    char userid[MAX_ID];                    
+    char bookBid[MAX_BID];                  
+    char borrowDate[MAX_DATE];              
+    char returnDate[MAX_DATE];              
+    char isOverdue;                           
 } Lend_Return;
 
-// 로그인 여부와 사용자 ID
 extern int is_logged_in;
 extern User current_user;
 
-// run �Լ� ����
 void run_help(const char* argument);
 void run_verify();
 void run_account();
@@ -89,9 +82,14 @@ void run_borrow();
 void run_return();
 void run_myinfo();
 
-// ���������� ���̴� �Լ���
-void print_command_usage();                     // ǥ ��� �Լ�
-char* get_canonical_command(const char* input); // ���Ǿ� �� ��ǥ���ɾ�
+void print_command_usage();  
+char* get_canonical_command(const char* input); 
 void trim(char* str);
+
+// login.c
+User login_user(); // 로그인 함수
+
+// account.c
+User register_user(); // 회원가입 함수
 
 #endif
