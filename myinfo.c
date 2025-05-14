@@ -121,6 +121,8 @@ void run_manage() {
 		}
 
 		if (strcmp(cmd, "list") == 0) {
+			printf("=>");
+			bool list_empty = true;
 			for (int i = 0; i < 5; i++) {
 				if (strlen(current_user.lentBids[i]) == 0) continue;
 
@@ -131,9 +133,11 @@ void run_manage() {
 						printf("Title: %s\n", b->title);
 						printf("Author: %s\n", b->author);
 						printf("BID: %s\n", b->bid);
+						list_empty = false;
 					}
 				}
 			}
+			if (list_empty) printf("\n");
 			break;
 		}
 		else if (strcmp(cmd, "record") == 0) {

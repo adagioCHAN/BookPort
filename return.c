@@ -58,13 +58,25 @@ void run_return() {
     while (1) {
         printf("Enter BID of the book to return > ");
         fgets(bid_input, sizeof(bid_input), stdin);
-        trim(bid_input);
+        bid_input[strcspn(bid_input, "\n")] = '\0';
 
         // BID 유효성 검사
-        if (!is_valid_bid(bid_input)) {
+        if (is_valid_bid(bid_input) == 7) {
+            printf(".!! Error: BID cannot be an empty string\n");
             continue;
         }
 
+        if (is_valid_bid(bid_input) == 8) {
+            printf(".!! Error: BID cannot consist of only whitespace characters\n");
+            continue;
+        }
+
+        if (is_valid_bid(bid_input) == 9) {
+            printf(".!! Error: A tab character cannot be placed between the first and last valid characters of the BID\n");
+            continue;
+        }
+
+        trim(bid_input);
         int found = -1;
         for (int i = 0; i < 5 - (temp_u->lendAvailable); i++) {
             if (!strcmp(bid_input, temp_u->lentBids[i])) {
@@ -107,9 +119,11 @@ void run_return() {
         printf("Enter return date > ");
         fgets(return_date, sizeof(return_date), stdin);
         trim(return_date);
+
         if (!is_valid_date(return_date)) {
             continue;
         }
+
         strcpy(temp_l->returnDate, return_date);
         //temp_l->isOverdue = 'N';
         break;

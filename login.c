@@ -171,6 +171,9 @@ User login_user() {
             case 5:
                 printf(".!! Error: Password must be at least 1 character long and include at least 1 digit\n");
                 break;
+            case 6:
+                printf(".!! Error: Password input can only be used in English, numbers, and special characters (ASCII standard characters expcept comma and semicolon)\n");
+                break;
             default:
                 printf(".!! Error: An unknown error occured\n");
                 break;

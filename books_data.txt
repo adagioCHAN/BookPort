@@ -1,10 +1,10 @@
-The Little Prince,AntoineDeSaintExupery,B-001.1,N
-Clean Code,RobertMartin,A-101.2,N
-Introduction to Algorithms,ThomasCormen,C-020.2,N
-C Programming Language,DennisRitchie,D-102.4,N
-AI Basics,AndrewNg,E-404.1,N
+The Little Prince,AntoineDeSaintExupery,B-001.1,Y
+Clean Code,RobertMartin,A-101.2,Y
+Introduction to Algorithms,ThomasCormen,C-020.2,Y
+C Programming Language,DennisRitchie,D-102.4,Y
+AI Basics,AndrewNg,E-404.1,Y
 Deep Learning,IanGoodfellow,F-008.2,Y
 Python Crash Course,EricMatthes,G-300.3,Y
-Operating Systems,AbrahamSilberschatz,H-111.1,Y
+Operating Systems,AbrahamSilberschatz,H-111.1,N
 Computer Networks,AndrewTanenbaum,I-999.9,Y
-Modern C++,BjarneStroustrup,B-003.3,N
+Modern C++,BjarneStroustrup,B-003.3,Y
