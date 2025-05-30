@@ -92,7 +92,8 @@ void run_record() {
 	if (user_record_count > 0) {
 		qsort(user_record, user_record_count, sizeof(RecordEntry), compare_record_entry);
 	}
-	if (user_record_count > 0) printf("=> ");
+	printf("=> ");
+	if (user_record_count == 0) printf("\n");
 	for (int i = 0; i < user_record_count; i++) {
 		char* d = user_record[i].date;
 		printf("[%s] %s %c%c/%c%c/%c%c\n",
@@ -120,11 +121,16 @@ void run_manage() {
 			continue;
 		}
 
+		bool enter = true;
 		if (strcmp(cmd, "list") == 0) {
 			printf("=>");
-			bool list_empty = true;
 			for (int i = 0; i < 5; i++) {
-				if (strlen(current_user.lentBids[i]) == 0) continue;
+				if (strlen(current_user.lentBids[i]) == 0) {
+					if (enter) {
+						printf("\n");
+						enter = false;
+					} continue;
+				}
 
 				for (node* j = bookdata->head; j != NULL; j = j->next) {
 					Book* b = (Book*)j->data;
@@ -133,11 +139,10 @@ void run_manage() {
 						printf("Title: %s\n", b->title);
 						printf("Author: %s\n", b->author);
 						printf("BID: %s\n", b->bid);
-						list_empty = false;
+						enter = false;
 					}
 				}
 			}
-			if (list_empty) printf("\n");
 			break;
 		}
 		else if (strcmp(cmd, "record") == 0) {
