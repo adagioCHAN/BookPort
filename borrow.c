@@ -7,6 +7,19 @@
 #include "common.h"
 #include "verify.h"
 
+//구분자 제거 함수
+void remove_separators(char* str) {
+    char* src = str;
+    char* dst = str;
+    while (*src) {
+        if (*src != '-' && *src != '/') {
+            *dst++ = *src;
+        }
+        src++;
+    }
+    *dst = '\0';
+}
+
 void run_borrow() {
     char bid_input[MAX_BID];
     Lend_Return lend;
@@ -132,6 +145,7 @@ void run_borrow() {
             continue;
         }
         trim(loan_date);
+        remove_separators(loan_date);//구분자 제거 추가
         strcpy(lend.borrowDate, loan_date);
         break;
     }
@@ -141,19 +155,21 @@ void run_borrow() {
     fgets(confirm, sizeof(confirm), stdin);
     trim(confirm);
 
-    if (_stricmp(confirm, "No") == 0) {
+    //'No' 입력 시에만 취소
+    if (strcmp(confirm, "No") == 0) {
         printf("Borrowing cancelled.\n");
         return;
     }
 
-    // 1. Update book status
+    // 1.도서 data 수정
     Book* book = find_by_bid(book_list, lend.bookBid);
     if (book) {
         book->isAvailable = 'N';
+        strcpy(book->studentid, current_user.studentId);
     }
     update_file(BOOK_FILE, book_list);
 
-    // 2. Update user data
+    // 2. user data 수정
     bool user_integrity = true;
     linked_list* user_list = read_user_data(&user_integrity);
     User* user = find_by_userId(user_list, current_user.studentId);
@@ -162,9 +178,8 @@ void run_borrow() {
         user->lendAvailable--;
     }
     update_file(USER_FILE, user_list);
-    printf("user data success");
 
-    // 3. Append to lend_return_data
+    // 3. lend_return_data 추가
     bool lend_integrity = true;
     linked_list* lend_list = read_borrow_data(&lend_integrity);
     Lend_Return* new_lend = (Lend_Return*)malloc(sizeof(Lend_Return));
@@ -174,7 +189,6 @@ void run_borrow() {
     strcpy(new_lend->bookBid, lend.bookBid);
     strcpy(new_lend->borrowDate, lend.borrowDate);
     strcpy(new_lend->returnDate, "");
-    new_lend->isOverdue = 'N';
     insert_back(lend_list, new_lend);
     update_file(LEND_RETURN_FILE, lend_list);
 
