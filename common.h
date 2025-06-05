@@ -21,14 +21,18 @@ typedef struct {
     char studentId[MAX_ID];              
     char password[MAX_PW];                 
     char lentBids[5][MAX_BID];              
-    int lendAvailable;                  
+    int lendAvailable;
+	int reserveAvailable;
+    char isOverdue;
 } User;
 
 typedef struct {
     char title[MAX_TITLE];                 
     char author[MAX_AUTHOR];              
     char bid[MAX_BID];                   
-    char isAvailable;                       
+    char isAvailable;  
+    char isReserveAvailable;
+	char studentId[MAX_ID];
 } Book;
 
 typedef struct node {
@@ -65,8 +69,7 @@ typedef struct {
     char userid[MAX_ID];                    
     char bookBid[MAX_BID];                  
     char borrowDate[MAX_DATE];              
-    char returnDate[MAX_DATE];              
-    char isOverdue;                           
+    char returnDate[MAX_DATE];                                        
 } Lend_Return;
 
 extern int is_logged_in;

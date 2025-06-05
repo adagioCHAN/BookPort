@@ -53,12 +53,14 @@ void run_account() {
                     strcpy(lentBidsInfo, "");
                 }
 
-                fprintf(file, "%s,%s,%s,%s,%d\n",
+                fprintf(file, "%s,%s,%s,%s,%d,%d,%s\n",
                     user.name,
                     user.studentId,
                     user.password,
                     lentBidsInfo,
-                    user.lendAvailable
+                    user.lendAvailable,
+                    user.reserveAvailable;
+                    user.isOverdue
                 );
 
                 fclose(file);
