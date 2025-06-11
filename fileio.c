@@ -173,13 +173,7 @@ linked_list* read_user_data(bool* file_integrity) {
 			}
 		}
 
-		if (!isdigit(data->lendAvailable)) {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
-		}
 		if (data->lendAvailable < 0 || data->lendAvailable>5) {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
-		}
-		if (!isdigit(data->reserveAvailable)) {
 			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
 		}
 		if (data->reserveAvailable < 0 || data->reserveAvailable>3) {
@@ -213,7 +207,7 @@ linked_list* read_user_data(bool* file_integrity) {
 			}
 			for (int j = pos + 1; data->lentBids[i][j]; j++) {
 				if (!isdigit(data->lentBids[i][j])) {
-					add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; continue;
+					add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; break;
 				}
 			}
 		}
@@ -277,7 +271,7 @@ linked_list* read_book_data(bool* file_integrity) {
 			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
 		}
 		for (int i = 0; data->title[i]; i++) {
-			if (!isalnum(data->title[i]) && data->title[i] != ' ') {
+			if ((isspace(data->title[i]) && data->title[i] != ' ')) {
 				add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; break;
 			}
 		}
@@ -332,24 +326,26 @@ linked_list* read_book_data(bool* file_integrity) {
 			add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; continue;
 		}
 
-		if (strlen(data->studentId) != 9) {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
-		}
-		if (data->studentId[0] == '0') {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
-		}
-		for (int i = 0; i < 9; i++) {
-			if (!isdigit(data->studentId[i])) {
-				add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; continue;
+		if (strlen(data->studentId) != 0) {
+			if (strlen(data->studentId) != 9) {
+				add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
 			}
-		}
-		for (char d = '0'; d <= '9'; d++) {
-			int count = 0;
-			for (int i = 0; data->studentId[i]; i++) {
-				if (data->studentId[i] == d) count++;
-				else count = 0;
-				if (count >= 8) {
-					add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; continue;
+			if (data->studentId[0] == '0') {
+				add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
+			}
+			for (int i = 0; i < 9; i++) {
+				if (!isdigit(data->studentId[i])) {
+					add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; break;
+				}
+			}
+			for (char d = '0'; d <= '9'; d++) {
+				int count = 0;
+				for (int i = 0; data->studentId[i]; i++) {
+					if (data->studentId[i] == d) count++;
+					else count = 0;
+					if (count >= 8) {
+						add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; break;
+					}
 				}
 			}
 		}
@@ -473,29 +469,28 @@ linked_list* read_borrow_data(bool* file_integrity) {
 		if (day < 1 || day > days_in_month[month - 1]) {
 			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
 		}
-
-		if (strlen(data->returnDate) != 8) {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
-		}
-		for (int i = 0; i < 8; i++) {
-			if (!isdigit(data->returnDate[i])) {
+		if (strlen(data->returnDate) != 0) {
+			if (strlen(data->returnDate) != 8) {
 				add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
 			}
-		}
-		year = (data->returnDate[0] - '0') * 1000 + (data->returnDate[1] - '0') * 100 + (data->returnDate[2] - '0') * 10 + (data->returnDate[3] - '0');
-		month = (data->returnDate[4] - '0') * 10 + (data->returnDate[5] - '0');
-		day = (data->returnDate[6] - '0') * 10 + (data->returnDate[7] - '0');
+			for (int i = 0; i < 8; i++) {
+				if (!isdigit(data->returnDate[i])) {
+					add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
+				}
+			}
+			year = (data->returnDate[0] - '0') * 1000 + (data->returnDate[1] - '0') * 100 + (data->returnDate[2] - '0') * 10 + (data->returnDate[3] - '0');
+			month = (data->returnDate[4] - '0') * 10 + (data->returnDate[5] - '0');
+			day = (data->returnDate[6] - '0') * 10 + (data->returnDate[7] - '0');
 
-		if (month < 1 || month > 12) {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
-		}
+			if (month < 1 || month > 12) {
+				add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
+			}
 
-		//int days_in_month[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+			if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) days_in_month[1] = 29;
 
-		if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) days_in_month[1] = 29;
-
-		if (day < 1 || day > days_in_month[month - 1]) {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
+			if (day < 1 || day > days_in_month[month - 1]) {
+				add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
+			}
 		}
 
 		if (stop_flag) {
@@ -583,7 +578,7 @@ bool check_equality(void* data1, void* data2, int type) {
 		Lend_Return* borrow_data2;
 		borrow_data1 = (Lend_Return*)data1;
 		borrow_data2 = (Lend_Return*)data2;
-		if (strcmp(borrow_data1->userid, borrow_data2->userid) != 0 || strcmp(borrow_data1->bookBid, borrow_data2->bookBid) != 0 || strcmp(borrow_data1->borrowDate, borrow_data2->borrowDate) != 0 || strcmp(borrow_data1->returnDate, borrow_data2->returnDate) != 0 || borrow_data1->isOverdue != borrow_data2->isOverdue) {
+		if (strcmp(borrow_data1->userid, borrow_data2->userid) != 0 || strcmp(borrow_data1->bookBid, borrow_data2->bookBid) != 0 || strcmp(borrow_data1->borrowDate, borrow_data2->borrowDate) != 0 || strcmp(borrow_data1->returnDate, borrow_data2->returnDate) != 0) {
 			return false;
 		}
 		break;
@@ -755,6 +750,8 @@ void print_list(linked_list* list, int type) {
 				printf(",");
 			}
 			printf(",%d\n", user_data->lendAvailable);
+			printf(",%d\n", user_data->reserveAvailable);
+			printf(",%s\n", user_data->studentId);
 		}
 		else if (type == 2) {
 			book_data = (Book*)current->data;
@@ -762,11 +759,13 @@ void print_list(linked_list* list, int type) {
 		}
 		else if (type == 3) {
 			borrow_data = (Lend_Return*)current->data;
-			printf("%s,%s,%s,%s,%d\n", borrow_data->userid, borrow_data->bookBid, borrow_data->borrowDate, borrow_data->returnDate, borrow_data->isOverdue);
+			printf("%s,%s,%s,%s\n", borrow_data->userid, borrow_data->bookBid, borrow_data->borrowDate, borrow_data->returnDate);
 		}
 		else if (type == 4) {
-			str = (char*)current->data;
-			printf("%s", str);
+			if (current->data != NULL) {
+				str = (char*)current->data;
+				printf("%s", str);
+			}
 		}
 		current = current->next;
 	}
