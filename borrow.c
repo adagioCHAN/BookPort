@@ -138,7 +138,7 @@ void run_borrow() {
                 strcpy(lend.bookBid, book->bid);
                 if (book->isAvailable != 'Y') {
                     printf("Error: The book is already borrowed.\n");
-                    check_reserve_available(book->bid);
+                    check_reserve_available(book);
                     found = 2;
                 }
                 book->isAvailable = 'N';
