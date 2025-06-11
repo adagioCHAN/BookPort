@@ -7,7 +7,42 @@
 #include "common.h"
 #include "verify.h"
 
-#define ADMIN_PASSWORD "admin123"
+#define ADMIN_PASSWORD "@admin_1pw$"
+
+void print_book(Book* b) {
+    printf("> Title: %s\n", b->title);
+    printf("  Author: %s\n", b->author);
+    printf("  BID: %s\n", b->bid);
+}
+
+void free_list(linked_list* list, int type) {
+    if (!list) return;
+
+    node* current = list->head;
+    while (current != NULL) {
+        node* next = current->next;
+
+        switch (type) {
+        case 1:
+            free((User*)current->data);
+            break;
+        case 2:
+            free((Book*)current->data);
+            break;
+        case 3:
+            free((Lend_Return*)current->data);
+            break;
+        case 4:
+            free((char*)current->data);
+            break;
+        default:
+            break;
+        }
+        free(current);
+        current = next;
+    }
+    free(list);
+}
 
 char* get_admin_canonical_command(char* input) {
     struct {
@@ -106,11 +141,6 @@ void delete() {
             continue;
         }
 
-        //if (is_valid_bid(bid_input) == 0) { 
-        //    printf(".!! Error: BID contains invalid characters");
-        //    continue; // bid 문법규칙상 나오는 게 맞는 메시지... 근데 기획서엔 없음
-        //}
-
         bool book_integrity = true;
         linked_list* book_list = read_book_data(&book_integrity);
         if (!book_list) {
@@ -132,38 +162,51 @@ void delete() {
 
         if (!target_book) {
             printf(".!! Error: The book does not exist.\n");
-            free_list(book_list);
+            free_list(book_list, 2);
             continue;
         }
 
         if (target_book->isAvailable != 'Y') {
             printf(".!! Error: The book that is on loan cannot be deleted.\n");
-            free_list(book_list);
+            free_list(book_list, 2);
             continue;
         }
 
         printf("...The following book matches the entered BID:\n");
-        //print_book(target_book);
+        print_book(target_book);
 
         char confirm[10];
         printf("BookPort: Do you really want to delete this book? (...No) >");
         if (!fgets(confirm, sizeof(confirm), stdin)) {
-            free_list(book_list);
+            free_list(book_list, 2);
             return;
         }
         confirm[strcspn(confirm, "\n")] = '\0';
 
-        if (strcmp(confirm, "No") == 0) {
+        if (strcmp(confirm, "No") == 0 || strcmp(confirm, "no") == 0 ||
+            strcmp(confirm, "NO") == 0 || strcmp(confirm, "nO") == 0) {
             printf("...Delete cancelled.\n");
-            free_list(book_list);
+            free_list(book_list, 2);
             return;
         }
+
+        if (target_book->isReserveAvailable == 'N') {
+            bool user_integrity = true;
+            linked_list* user_list = read_user_data(&user_integrity);
+            User* reserver = find_by_userId(user_list, target_book->studentId);
+            if (reserver != NULL) {
+                reserver->reserveAvailable += 1;
+            }
+            update_file(USER_FILE, user_list);
+            free_list(user_list, 1);
+        }
+
 
         remove_node(book_list, target_book, 2);
         update_file(BOOK_FILE, book_list);
         printf("...Book deleted\n");
 
-        free_list(book_list);
+        free_list(book_list, 2);
         run_verify();
         return;
     }
@@ -180,7 +223,8 @@ bool exit_admin() {
 
     input[strcspn(input, "\n")] = '\0';
 
-    if (strcmp(input, "No") == 0) {
+    if (strcmp(input, "No") == 0 || strcmp(input, "no") == 0 ||
+        strcmp(input, "NO") == 0 || strcmp(input, "nO") == 0) {
         printf("...Exit cancelled\n");
         return false;
     }
@@ -235,4 +279,3 @@ void run_admin() {
         }
     }
 }
-
