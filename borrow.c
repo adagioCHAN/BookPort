@@ -7,6 +7,68 @@
 #include "common.h"
 #include "verify.h"
 
+void check_reserve_available(Book* bookBid) {
+    char buffer[200];
+    bool book_integrity = true;
+    linked_list* book_list = read_book_data(&book_integrity);
+
+    bool user_integrity = true;
+    linked_list* user_list = read_user_data(&user_integrity);
+    User* user = find_by_userId(user_list, current_user.studentId);
+
+    printf(".!!Error: The book is currently not available to borrow.\n");
+
+    //책이 이미 예약 중
+    if (bookBid->isReserveAvailable == 'N') {
+        printf("The book cannot be reserved. It is already reserved.\n");
+        return;
+    }
+    //사용자의 예약 가능 도서 개수 초과
+    else if (user->reserveAvailable <= 0) {
+        printf("The book cannot be reserved. Reservation limit reached.\n");
+        return;
+    }
+    //예약할건지 여부 확인
+    printf("BookPort: Do you want to reserve this book? (.../No) >");
+    fgets(buffer, sizeof(buffer), stdin);
+    buffer[strcspn(buffer, "\n")] = '\0';
+
+    //No인 경우
+    if (check_input(buffer) == 0) return;
+
+    //No외 다른 것일 경우
+    else {
+        //현재 사용자의 <예약 가능 도서 개수>를 수정 
+        user->reserveAvailable--;
+        //해당 도서의 <예약 가능 여부>를 ‘N
+        bookBid->isReserveAvailable = 'N';
+        // <예약 중인 사용자 학번>을 추가 
+        strcpy(bookBid->studentId, user->studentId);
+        //file update
+        update_file(BOOK_FILE, book_list);
+        update_file(LEND_RETURN_FILE, user_list);
+
+        // 예약되었다는 안내 메세지
+        printf("The book has been successfully reserved.\n");
+        // 주 프롬프트로 돌아갑니다.
+        return;
+    }
+    return;
+}
+
+//구분자 제거 함수
+void remove_separators(char* str) {
+    char* src = str;
+    char* dst = str;
+    while (*src) {
+        if (*src != '-' && *src != '/') {
+            *dst++ = *src;
+        }
+        src++;
+    }
+    *dst = '\0';
+}
+
 void run_borrow() {
     char bid_input[MAX_BID];
     Lend_Return lend;
@@ -76,6 +138,7 @@ void run_borrow() {
                 strcpy(lend.bookBid, book->bid);
                 if (book->isAvailable != 'Y') {
                     printf("Error: The book is already borrowed.\n");
+                    check_reserve_available(book->bid);
                     found = 2;
                 }
                 book->isAvailable = 'N';
@@ -83,6 +146,7 @@ void run_borrow() {
             }
             current = current->next;
         }
+
         if (found == 0) {
             printf("Error: No matching book found.\n");
             continue;
@@ -132,6 +196,7 @@ void run_borrow() {
             continue;
         }
         trim(loan_date);
+        remove_separators(loan_date);//구분자 제거 추가
         strcpy(lend.borrowDate, loan_date);
         break;
     }
@@ -141,19 +206,21 @@ void run_borrow() {
     fgets(confirm, sizeof(confirm), stdin);
     trim(confirm);
 
-    if (_stricmp(confirm, "No") == 0) {
+    //'No' 입력 시에만 취소
+    if (strcmp(confirm, "No") == 0) {
         printf("Borrowing cancelled.\n");
         return;
     }
 
-    // 1. Update book status
+    // 1.도서 data 수정
     Book* book = find_by_bid(book_list, lend.bookBid);
     if (book) {
         book->isAvailable = 'N';
+        strcpy(book->studentid, current_user.studentId);
     }
     update_file(BOOK_FILE, book_list);
 
-    // 2. Update user data
+    // 2. user data 수정
     bool user_integrity = true;
     linked_list* user_list = read_user_data(&user_integrity);
     User* user = find_by_userId(user_list, current_user.studentId);
@@ -162,9 +229,8 @@ void run_borrow() {
         user->lendAvailable--;
     }
     update_file(USER_FILE, user_list);
-    printf("user data success");
 
-    // 3. Append to lend_return_data
+    // 3. lend_return_data 추가
     bool lend_integrity = true;
     linked_list* lend_list = read_borrow_data(&lend_integrity);
     Lend_Return* new_lend = (Lend_Return*)malloc(sizeof(Lend_Return));
@@ -174,7 +240,6 @@ void run_borrow() {
     strcpy(new_lend->bookBid, lend.bookBid);
     strcpy(new_lend->borrowDate, lend.borrowDate);
     strcpy(new_lend->returnDate, "");
-    new_lend->isOverdue = 'N';
     insert_back(lend_list, new_lend);
     update_file(LEND_RETURN_FILE, lend_list);
 

@@ -1,5 +1,4 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
-
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -8,6 +7,88 @@
 #include "verify.h"
 
 User get_user_by_id(const char* id) {
+    FILE* file = fopen(USER_FILE, "r");
+    User user = { 0 };
+
+    if (!file)
+        return user;
+
+    char line[512];
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = 0;
+
+        char* fields[7] = { NULL };
+        int field_idx = 0;
+        char* p = line;
+        char* start = line;
+
+        while (*p && field_idx < 7) {
+            if (*p == ',') {
+                *p = '\0';
+                fields[field_idx++] = start;
+                start = p + 1;
+            }
+            p++;
+        }
+
+        if (field_idx < 7) {
+            fields[field_idx++] = start;
+        }
+
+        if (strcmp(fields[1], id) == 0) {
+            if (fields[0]) strncpy(user.name, fields[0], MAX_NAME);
+            if (fields[1]) strncpy(user.studentId, fields[1], MAX_ID);
+            if (fields[2]) strncpy(user.password, fields[2], MAX_PW);
+
+            // lentBids
+            if (fields[3]) {
+                if (strlen(fields[3]) == "") {
+                    for (int j = 0; j < 5; j++) user.lentBids[j][0] = '\0';
+                }
+                else {
+                    char* bidToken = strtok(fields[3], ";");
+                    for (int j = 0; j < 5; j++) {
+                        if (bidToken) {
+                            strncpy(user.lentBids[j], bidToken, MAX_BID);
+                            bidToken = strtok(NULL, ";");
+                        }
+                        else {
+                            user.lentBids[j][0] = '\0';
+                        }
+                    }
+                }
+            }
+
+            // lendAvailable
+            if (fields[4]) {
+                char* endptr;
+                long val = strtol(fields[4], &endptr, 10);
+                user.lendAvailable = (*endptr == '\0') ? (int)val : 0;
+            }
+
+            // reserveAvailable
+            if (fields[5]) {
+                char* endptr;
+                long val = strtol(fields[5], &endptr, 10);
+                user.reserveAvailable = (*endptr == '\0') ? (int)val : 0;
+            }
+
+            // isOverdue
+            if (fields[6]) user.isOverdue = *fields[6];
+
+            fclose(file);
+            return user;
+        }
+    }
+
+    fclose(file);
+    User empty_user = { 0 };
+    return empty_user;
+}
+
+
+
+User get_user_by_id2(const char* id) {
     FILE* file = fopen(USER_FILE, "r");
     User user = { 0 };
 
@@ -28,26 +109,55 @@ User get_user_by_id(const char* id) {
             token = strtok(NULL, ",");
             if (token) strncpy(user.password, token, MAX_PW);
 
+            // lendBids 파싱
             token = strtok(NULL, ",");
             if (token) {
-                char* bidToken = strtok(token, ";");
-                for (int i = 0; i < 5; i++) {
-                    if (bidToken) {
-                        strncpy(user.lentBids[i], bidToken, MAX_BID);
-                        bidToken = strtok(NULL, ";");
+                if (strlen(token) == 0) {
+                    for (int i = 0; i, 5; i++)
+                        user.lentBids[i][0] = '\0';
+                }
+                else {
+                    char* bidToken = strtok(token, ";");
+                    for (int i = 0; i < 5; i++) {
+                        if (bidToken) {
+                            strncpy(user.lentBids[i], bidToken, MAX_BID);
+                            bidToken = strtok(NULL, ";");
+                        }
+                        else
+                            user.lentBids[i][0] = '\0'; // 대여한 책 BID 초기화
                     }
-                    else
-                        user.lentBids[i][0] = '\0'; // 대여한 책 BID 초기화
+
                 }
             }
 
-
+            /*
             user.lendAvailable = 5;
             for (int i = 0; i < 5; i++) {
                 if (user.lentBids[i][0] != '\0') {
                     user.lendAvailable--;
                 }
             }
+            */
+
+            // lendAvailable
+            token = strtok(NULL, ",");
+            if (token) {
+                char* endptr;
+                long val = strtol(token, &endptr, 10);
+                user.lendAvailable = (*endptr == '\0') ? (int)val : 0;
+            }
+
+            // reserveAvailable
+            token = strtok(NULL, ",");
+            if (token) {
+                char* endptr;
+                long val = strtol(token, &endptr, 10);
+                user.reserveAvailable = (*endptr == '\0') ? (int)val : 0;
+            }
+
+            // isOverdue (단일 문자)
+            token = strtok(NULL, ",");
+            if (token) user.isOverdue = *token;
 
             fclose(file);
             return user;
