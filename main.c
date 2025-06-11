@@ -132,7 +132,8 @@ int main() {
             else if (strcmp(cmd, "borrow") == 0) run_borrow();
             else if (strcmp(cmd, "return") == 0) run_return();
             else if (strcmp(cmd, "myinfo") == 0) run_myinfo();
-            else if (strcmp(cmd, "admin") == 0) run_admin();
+            //else if (strcmp(cmd, "admin") == 0) run_admin();
+            }
         }
     }
 

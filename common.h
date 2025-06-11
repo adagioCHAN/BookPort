@@ -85,7 +85,7 @@ int run_search(int mode);
 void run_borrow();
 void run_return();
 void run_myinfo();
-void admin();
+void run_admin();
 
 void print_command_usage();
 char* get_canonical_command(const char* input);

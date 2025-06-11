@@ -111,7 +111,8 @@ void delete() {
         //    continue; // bid 문법규칙상 나오는 게 맞는 메시지... 근데 기획서엔 없음
         //}
 
-        linked_list* book_list = read_book_data();
+        bool book_integrity = true;
+        linked_list* book_list = read_book_data(&book_integrity);
         if (!book_list) {
             printf(".!! Error: Failed to read book data.\n");
             return;
@@ -142,7 +143,7 @@ void delete() {
         }
 
         printf("...The following book matches the entered BID:\n");
-        print_book(target_book);
+        //print_book(target_book);
 
         char confirm[10];
         printf("BookPort: Do you really want to delete this book? (...No) >");
@@ -152,7 +153,7 @@ void delete() {
         }
         confirm[strcspn(confirm, "\n")] = '\0';
 
-        if (stricmp(confirm, "No") == 0) {
+        if (strcmp(confirm, "No") == 0) {
             printf("...Delete cancelled.\n");
             free_list(book_list);
             return;
@@ -179,7 +180,7 @@ bool exit_admin() {
 
     input[strcspn(input, "\n")] = '\0';
 
-    if (stricmp(input, "No") == 0) {
+    if (strcmp(input, "No") == 0) {
         printf("...Exit cancelled\n");
         return false;
     }

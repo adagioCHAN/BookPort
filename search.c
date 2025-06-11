@@ -161,6 +161,7 @@ Book* filterBooks(const Book* allBooks, int totalCount, SearchInput input, int* 
 
     for (int i = 0; i < totalCount; i++) {
         const Book* book = &allBooks[i];
+        trim(input.bid);
 
         // 조건 체크
         if (input.title && !match_string(book->title, input.title)) continue;
