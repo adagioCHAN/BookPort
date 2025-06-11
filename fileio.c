@@ -294,27 +294,9 @@ linked_list* read_book_data(bool* file_integrity) {
 		if (strlen(data->bid) == 0) {
 			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
 		}
-		if (data->bid[1] != '-') {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
-		}
-		int pos;
-		for (int i = 2; data->bid[i]; i++) {
-			if (!isdigit(data->bid[i])) {
-				if (data->bid[i] != '.') {
-					add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; pos = i; break;
-				}
-				else {
-					pos = i;
-					break;
-				}
-			}
-		}
-		if (pos + 1 == strlen(data->bid)) {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; continue;
-		}
-		for (int i = pos + 1; data->bid[i]; i++) {
-			if (!isdigit(data->bid[i])) {
-				add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; continue;
+		for (int i = 0; data->bid[i]; i++) {
+			if (isspace(data->bid[i]) && !(data->bid[i] == '-' || data->bid[i] == ':' || data->bid == '.')) {
+				add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; break;
 			}
 		}
 
@@ -423,27 +405,9 @@ linked_list* read_borrow_data(bool* file_integrity) {
 		if (strlen(data->bookBid) == 0) {
 			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
 		}
-		if (data->bookBid[1] != '-') {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
-		}
-		int pos;
-		for (int i = 2; data->bookBid[i]; i++) {
-			if (!isdigit(data->bookBid[i])) {
-				if (data->bookBid[i] != '.') {
-					add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; pos = i; break;
-				}
-				else {
-					pos = i;
-					break;
-				}
-			}
-		}
-		if (pos + 1 == strlen(data->bookBid)) {
-			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
-		}
-		for (int i = pos + 1; data->bookBid[i]; i++) {
-			if (!isdigit(data->bookBid[i])) {
-				add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; continue;
+		for (int i = 0; data->bookBid[i]; i++) {
+			if (isspace(data->bookBid[i]) && !(data->bookBid[i] == '-' || data->bookBid[i] == ':' || data->bookBid == '.')) {
+				add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; break;
 			}
 		}
 
