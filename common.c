@@ -38,7 +38,7 @@ void run_account() {
                 printf(".!! Error: Failed to open file.\n");
             else {
                 char lentBidsInfo[MAX_BID] = "";
-                
+
                 int hasValue = 0;
 
                 for (int i = 0; i < 5; i++) {
@@ -53,13 +53,13 @@ void run_account() {
                     strcpy(lentBidsInfo, "");
                 }
 
-                fprintf(file, "%s,%s,%s,%s,%d,%d,%s\n",
+                fprintf(file, "%s,%s,%s,%s,%d,%d,%c\n",
                     user.name,
                     user.studentId,
                     user.password,
                     lentBidsInfo,
                     user.lendAvailable,
-                    user.reserveAvailable;
+                    user.reserveAvailable,
                     user.isOverdue
                 );
 

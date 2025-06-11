@@ -142,7 +142,6 @@ User register_user() {
     }
 
     // 회원가입 의사 확인
-
     while (1) {
         printf("\n⇒ Student ID: %s\n", new_user.studentId);
         printf("   Password: %s\n", new_user.password);
@@ -153,17 +152,17 @@ User register_user() {
         if (check_input(buffer) == 0) {
             printf("Account creation canceled.\n");
             User empty_user = { 0 };
-            return empty_user; // 빈 사용자 구조체 반환
+            return empty_user;                  // 빈 사용자 구조체 반환
         }
         else {
             for (int i = 0; i < 5; i++)
                 new_user.lentBids[i][0] = '\0'; // 대여한 책 BID 초기화
-            new_user.lendAvailable = 5; // 대여 가능 권수 초기화
-			new_user.reserveAvailable = 3; // 예약 가능 권수 초기화
-			new_user.isOverdue = 'N'; // 연체 여부 초기화
+            new_user.lendAvailable = 5;         // 대여 가능 권수 초기화
+			new_user.reserveAvailable = 3;      // 예약 가능 권수 초기화
+			new_user.isOverdue = 'N';           // 연체 여부 초기화
 
             printf("Account successfully created.\n");
-            return new_user; // 성공적으로 생성된 사용자 구조체 반환
+            return new_user;                    // 성공적으로 생성된 사용자 구조체 반환
 
         }
     }

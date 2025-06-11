@@ -1,4 +1,4 @@
-#ifndef DATA_STRUCTURES_H
+﻿#ifndef DATA_STRUCTURES_H
 #define DATA_STRUCTURES_H
 
 #include <stdbool.h>
@@ -17,22 +17,22 @@
 #define LEND_RETURN_FILE "lend_return_data.txt" 
 
 typedef struct {
-    char name[MAX_NAME];                  
-    char studentId[MAX_ID];              
-    char password[MAX_PW];                 
-    char lentBids[5][MAX_BID];              
-    int lendAvailable;
-	int reserveAvailable;
-    char isOverdue;
+	char name[MAX_NAME];        // 이름
+	char studentId[MAX_ID];     // 학번
+	char password[MAX_PW];      // 비밀번호    
+    char lentBids[5][MAX_BID];  // 대여한 책 BID   
+	int lendAvailable;          // 대여 가능 권수
+	int reserveAvailable;       // 예약 가능 권수
+	char isOverdue;            // 연체 여부
 } User;
 
 typedef struct {
-    char title[MAX_TITLE];                 
-    char author[MAX_AUTHOR];              
-    char bid[MAX_BID];                   
-    char isAvailable;  
-    char isReserveAvailable;
-	char studentId[MAX_ID];
+	char title[MAX_TITLE];      // 책 제목
+	char author[MAX_AUTHOR];	// 책 저자
+	char bid[MAX_BID];		    // 책 BID
+	char isAvailable;           // 책 대여 가능 여부
+	char isReserveAvailable;    // 책 예약 가능 여부
+	char studentId[MAX_ID];     // 예약한 학생 ID
 } Book;
 
 typedef struct node {
@@ -66,10 +66,11 @@ bool check_empty(char* token, bool* file_integrity);
 void add_violation_line(linked_list* list, char* line);
 
 typedef struct {
-    char userid[MAX_ID];                    
-    char bookBid[MAX_BID];                  
-    char borrowDate[MAX_DATE];              
-    char returnDate[MAX_DATE];                                        
+    char userid[MAX_ID];
+    char bookBid[MAX_BID];
+    char borrowDate[MAX_DATE];
+    char returnDate[MAX_DATE];
+	char isOverdue; // 'Y' for overdue, 'N' for not overdue
 } Lend_Return;
 
 extern int is_logged_in;
@@ -85,8 +86,8 @@ void run_borrow();
 void run_return();
 void run_myinfo();
 
-void print_command_usage();  
-char* get_canonical_command(const char* input); 
+void print_command_usage();
+char* get_canonical_command(const char* input);
 void trim(char* str);
 
 // login.c
