@@ -194,8 +194,7 @@ void run_return() {
     else {
         temp_u->lendAvailable++;
         temp_b->isAvailable = 'Y';
-        if (temp_u->reserveAvailable == 'N')
-            auto_borrow(temp_b, return_date);
+        auto_borrow(temp_b, return_date);
     }
 
     if (!update_file(USER_FILE, user_list) || !update_file(BOOK_FILE, book_list) || !update_file(LEND_RETURN_FILE, lend_list)) {
