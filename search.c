@@ -217,7 +217,7 @@ int run_search(int mode) {
         bool book_integrity = true;
         linked_list* book_list = read_book_data(&book_integrity);
         if (!book_integrity) {
-            print_list(book_list, 4);
+            printf(book_list);
             freeSearchInput(&input);
             return -1;
         }

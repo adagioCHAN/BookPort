@@ -49,9 +49,9 @@ typedef struct linked_list {
 
 
 bool update_file(const char* file_name, linked_list* list);
-linked_list* read_user_data();
-linked_list* read_book_data();
-linked_list* read_borrow_data();
+linked_list* read_user_data(bool* file_integrity);
+linked_list* read_book_data(bool* file_integrity);
+linked_list* read_borrow_data(bool* file_integrity);
 void insert_back(linked_list* list, void* data);
 void insert_front(linked_list* list, void* data, int type);
 void* find(linked_list* list, void* data, int type);
@@ -85,6 +85,7 @@ int run_search(int mode);
 void run_borrow();
 void run_return();
 void run_myinfo();
+void admin();
 
 void print_command_usage();
 char* get_canonical_command(const char* input);

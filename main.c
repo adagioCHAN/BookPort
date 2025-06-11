@@ -38,7 +38,8 @@ char* get_canonical_command(char* input) {
         { { "/", "search", "searc", "sear", "se", "sea", "s" }, "search" },
         { { "$", "borrow", "borro", "borr", "bor", "bo", "b" }, "borrow" },
         { { "r", "return", "retur", "retu", "ret", "re" }, "return" },
-        { { "info", "myinfo", "myinf", "myin", "myi", "my", "m" }, "myinfo" }
+        { { "info", "myinfo", "myinf", "myin", "myi", "my", "m" }, "myinfo" },
+        { { "adm", "admi"}, "admin" }
     };
 
     for (int i = 0; i < sizeof(cmd_table) / sizeof(cmd_table[0]); i++) {
@@ -64,6 +65,7 @@ void print_command_usage() {
     printf(" a account| None                  | Move to create account prompt\n");
     printf(" r return| None                   | Move to return prompt     \n");
     printf(" info myinfo| None               | Show member¡¯s information \n");
+    printf(" adm admin | None            | Move to admin page\n");
     printf("--------------------------------------------------------------\n");
 }
 
@@ -108,7 +110,9 @@ int main() {
             strcmp(cmd, "search") == 0 ||
             strcmp(cmd, "borrow") == 0 ||
             strcmp(cmd, "return") == 0 ||
-            strcmp(cmd, "myinfo") == 0) {
+            strcmp(cmd, "myinfo") == 0 ||
+            strcmp(cmd, "admin") == 0) {
+{
 
             if (argument != NULL || extra != NULL) {
                 printf(".!! Error: No arguments should be provided.\n");
@@ -128,6 +132,7 @@ int main() {
             else if (strcmp(cmd, "borrow") == 0) run_borrow();
             else if (strcmp(cmd, "return") == 0) run_return();
             else if (strcmp(cmd, "myinfo") == 0) run_myinfo();
+            else if (strcmp(cmd, "admin") == 0) run_admin();
         }
     }
 

@@ -160,7 +160,7 @@ linked_list* read_user_data(bool* file_integrity) {
 			if (isspace(data->password[i])) {
 				add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; break;
 			}
-			if (isnum(data->password[i])) cnt_num++;
+			if (isdigit(data->password[i])) cnt_num++;
 			if (isalpha(data->password[i])) cnt_alpha++;
 			cnt_arr[(unsigned char)data->password[i]]++;
 		}
@@ -490,7 +490,8 @@ linked_list* read_borrow_data(bool* file_integrity) {
 			add_violation_line(violation_lines, line_copy); *file_integrity = false; continue;
 		}
 
-		int days_in_month[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+		//int days_in_month[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+
 		if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) days_in_month[1] = 29;
 
 		if (day < 1 || day > days_in_month[month - 1]) {
