@@ -161,12 +161,11 @@ Book* filterBooks(const Book* allBooks, int totalCount, SearchInput input, int* 
 
     for (int i = 0; i < totalCount; i++) {
         const Book* book = &allBooks[i];
-        trim(input.bid);
 
         // 조건 체크
         if (input.title && !match_string(book->title, input.title)) continue;
         if (input.author && !match_string(book->author, input.author)) continue;
-        if (input.bid && strcmp(book->bid, input.bid) != 0) continue;
+        if (input.bid && !match_string(book->bid, input.bid)) continue;
 
         results[count++] = *book; // 조건 만족 시 복사
     }
@@ -182,7 +181,7 @@ Book* filterBooks(const Book* allBooks, int totalCount, SearchInput input, int* 
 }
 
 /* printSearchResults 함수 (fileio.c 완성 후 가능 여부, 예약 중인 사용자 학번 추가 예정)*/
-void printSearchResults(const Book* results, int count) {
+void printSearchResults(const Book* results, int count, int mode) {
     printf("\n[Search Result]\n");
 
     for (int i = 0; i < count; i++) {
@@ -190,8 +189,14 @@ void printSearchResults(const Book* results, int count) {
         printf("> Title: %s\n", book->title);
         printf("  Author: %s\n", book->author);
         printf("  BID: %s\n", book->bid);
-        printf("  Availibility: %c\n\n", book->isAvailable);
+        if (mode == 1) {
+            printf("\n");
+        }
+        if (mode == 0) {
+            printf("  Availibility: %c\n\n", book->isAvailable);
+        }
     }
+
 }
 
 int run_search(int mode) {
@@ -204,14 +209,12 @@ int run_search(int mode) {
 
         if (strlen(inputBuf) == 0) {
             printf("!! Error: Empty input\n\n");
-            if (mode == 0) return 0;
             continue;
         }
 
         SearchInput input = parseSearchInput(inputBuf);
         if (!input.title && !input.author && !input.bid) {
             printf("!! Error: No valid field detected.\n\n");
-            if (mode == 0) return 0;
             continue;
         }
 
@@ -240,7 +243,7 @@ int run_search(int mode) {
         Book* filtered = filterBooks(allBooks, totalCount, input, &resultCount);
 
         if (resultCount > 0) {
-            printSearchResults(filtered, resultCount);
+            printSearchResults(filtered, resultCount, mode);
 
             int count_y = 0;
             for (int i = 0; i < resultCount; i++) {
@@ -257,7 +260,6 @@ int run_search(int mode) {
             printf("!! Error: No matching data found.\n\n");
             free(allBooks);
             freeSearchInput(&input);
-            if (mode == 0) return 0;
             continue;
         }
     }
