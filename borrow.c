@@ -19,6 +19,7 @@ void check_reserve_available(Book* bookBid) {
     printf(".!!Error: The book is currently not available to borrow.\n");
 
     //책이 이미 예약 중
+    
     if (bookBid->isReserveAvailable == 'N') {
         printf("The book cannot be reserved. It is already reserved.\n");
         return;
