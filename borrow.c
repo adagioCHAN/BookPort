@@ -216,7 +216,7 @@ void run_borrow() {
     Book* book = find_by_bid(book_list, lend.bookBid);
     if (book) {
         book->isAvailable = 'N';
-        strcpy(book->studentid, current_user.studentId);
+        strcpy(book->studentId, current_user.studentId);
     }
     update_file(BOOK_FILE, book_list);
 
