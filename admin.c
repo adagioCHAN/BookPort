@@ -7,7 +7,42 @@
 #include "common.h"
 #include "verify.h"
 
-#define ADMIN_PASSWORD "admin123"
+#define ADMIN_PASSWORD "@admin_1pw$"
+
+void print_book(Book* b) {
+    printf("> Title: %s\n", b->title);
+    printf("  Author: %s\n", b->author);
+    printf("  BID: %s\n", b->bid);
+}
+
+void free_list(linked_list* list, int type) {
+    if (!list) return;
+
+    node* current = list->head;
+    while (current != NULL) {
+        node* next = current->next;
+
+        switch (type) {
+        case 1:
+            free((User*)current->data);
+            break;
+        case 2:
+            free((Book*)current->data);
+            break;
+        case 3:
+            free((Lend_Return*)current->data);
+            break;
+        case 4:
+            free((char*)current->data);
+            break;
+        default:
+            break;
+        }
+        free(current);
+        current = next;
+    }
+    free(list);
+}
 
 char* get_admin_canonical_command(char* input) {
     struct {
@@ -73,16 +108,19 @@ void add() {
     bool book_integrity = true;
     linked_list* book_list = read_book_data(&book_integrity);
     Book* new_book = (Book*)malloc(sizeof(Book));
+
     strcpy(new_book->title, title);
     strcpy(new_book->author, author);
     strcpy(new_book->bid, bid);
-    strcpy(new_book->isAvailable, "Y");
-    strcpy(new_book->isReserveAvailable, "N");
+    new_book->isAvailable = 'Y';
+    new_book->isReserveAvailable = 'N';
     strcpy(new_book->studentId, "");
+
     insert_back(book_list, new_book);
-    update_file(BOOK_FILE, new_book);
+    update_file(BOOK_FILE, book_list);
     printf("Book added successfully.\n");
 }
+
 
 void delete() {
     char bid_input[50];
@@ -106,11 +144,6 @@ void delete() {
             continue;
         }
 
-        //if (is_valid_bid(bid_input) == 0) { 
-        //    printf(".!! Error: BID contains invalid characters");
-        //    continue; // bid ¹®¹ý±ÔÄ¢»ó ³ª¿À´Â °Ô ¸Â´Â ¸Þ½ÃÁö... ±Ùµ¥ ±âÈ¹¼­¿£ ¾øÀ½
-        //}
-
         bool book_integrity = true;
         linked_list* book_list = read_book_data(&book_integrity);
         if (!book_list) {
@@ -123,6 +156,7 @@ void delete() {
 
         while (current) {
             Book* b = (Book*)current->data;
+            //printf("DEBUG: BID in list = [%s]\n", b->bid); // ë””ë²„ê¹…ìš©
             if (strcmp(b->bid, bid_input) == 0) {
                 target_book = b;
                 break;
@@ -132,38 +166,51 @@ void delete() {
 
         if (!target_book) {
             printf(".!! Error: The book does not exist.\n");
-            free_list(book_list);
+            free_list(book_list, 2);
             continue;
         }
 
         if (target_book->isAvailable != 'Y') {
             printf(".!! Error: The book that is on loan cannot be deleted.\n");
-            free_list(book_list);
+            free_list(book_list, 2);
             continue;
         }
 
         printf("...The following book matches the entered BID:\n");
-        //print_book(target_book);
+        print_book(target_book);
 
         char confirm[10];
         printf("BookPort: Do you really want to delete this book? (...No) >");
         if (!fgets(confirm, sizeof(confirm), stdin)) {
-            free_list(book_list);
+            free_list(book_list, 2);
             return;
         }
         confirm[strcspn(confirm, "\n")] = '\0';
 
-        if (strcmp(confirm, "No") == 0) {
+        if (strcmp(confirm, "No") == 0 || strcmp(confirm, "no") == 0 ||
+            strcmp(confirm, "NO") == 0 || strcmp(confirm, "nO") == 0) {
             printf("...Delete cancelled.\n");
-            free_list(book_list);
+            free_list(book_list, 2);
             return;
         }
+
+        if (target_book->isReserveAvailable == 'N') {
+            bool user_integrity = true;
+            linked_list* user_list = read_user_data(&user_integrity);
+            User* reserver = find_by_userId(user_list, target_book->studentId);
+            if (reserver != NULL) {
+                reserver->reserveAvailable += 1;
+            }
+            update_file(USER_FILE, user_list);
+            free_list(user_list, 1);
+        }
+
 
         remove_node(book_list, target_book, 2);
         update_file(BOOK_FILE, book_list);
         printf("...Book deleted\n");
 
-        free_list(book_list);
+        free_list(book_list, 2);
         run_verify();
         return;
     }
@@ -180,7 +227,8 @@ bool exit_admin() {
 
     input[strcspn(input, "\n")] = '\0';
 
-    if (strcmp(input, "No") == 0) {
+    if (strcmp(input, "No") == 0 || strcmp(input, "no") == 0 ||
+        strcmp(input, "NO") == 0 || strcmp(input, "nO") == 0) {
         printf("...Exit cancelled\n");
         return false;
     }
@@ -235,4 +283,3 @@ void run_admin() {
         }
     }
 }
-
