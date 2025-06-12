@@ -1,2 +1,8 @@
-The Little Prince,AntoineDeSaintExupery,B-001.1,Y,Y,202411377
-Clean Code,RobertMartin,A-101.2,Y,Y,202411377
+The Little Prince,AntoineDeSaintExupery,B-001.1,N,Y,202411377
+Clean Code,RobertMartin,A-101.2,Y,Y,
+1984,GeorgeOrwell,D-204.3,Y,Y,
+To Kill a Mockingbird,HarperLee,C-150.7,Y,Y,
+Sapiens,YuvalNoahHarari,F-309.9,Y,Y,
+The Great Gatsby,FScottFitzgerald,E-023.4,Y,Y,
+Thinking Fast and Slow,DanielKahneman,G-451.6,Y,Y,
+data structure,Nam,N-899.3,Y,N,
