@@ -196,6 +196,10 @@ void run_borrow() {
             printf(".!! Error: The date must exist in the Gregorian calendar\n");
             continue;
         }
+        if (is_valid_date(loan_date) == 0) {
+            printf(".!! Error: The format of the loan date is invalid.\n");
+            continue;
+        }
         trim(loan_date);
         remove_separators(loan_date);//구분자 제거 추가
         strcpy(lend.borrowDate, loan_date);
