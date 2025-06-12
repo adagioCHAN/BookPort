@@ -23,7 +23,7 @@ bool update_file(const char* file_name, linked_list* list) {
 			if (user_data->lendAvailable == 5) {
 				fprintf(fp, ",");
 			}
-			fprintf(fp, ",%d,%d,%c", user_data->lendAvailable, user_data->reserveAvailable, user_data->isOverdue);
+			fprintf(fp, ",%d,%d,%c\n", user_data->lendAvailable, user_data->reserveAvailable, user_data->isOverdue);
 		}
 		else if (strcmp(file_name, BOOK_FILE) == 0) {
 			book_data = (Book*)current->data;
