@@ -39,7 +39,7 @@ char* get_canonical_command(char* input) {
         { { "$", "borrow", "borro", "borr", "bor", "bo", "b" }, "borrow" },
         { { "r", "return", "retur", "retu", "ret", "re" }, "return" },
         { { "info", "myinfo", "myinf", "myin", "myi", "my", "m" }, "myinfo" },
-        { { "adm", "admi"}, "admin" }
+        { { "adm", "admi", "admin"}, "admin"}
     };
 
     for (int i = 0; i < sizeof(cmd_table) / sizeof(cmd_table[0]); i++) {
@@ -132,7 +132,7 @@ int main() {
             else if (strcmp(cmd, "borrow") == 0) run_borrow();
             else if (strcmp(cmd, "return") == 0) run_return();
             else if (strcmp(cmd, "myinfo") == 0) run_myinfo();
-            //else if (strcmp(cmd, "admin") == 0) run_admin();
+            else if (strcmp(cmd, "admin") == 0) run_admin();
             }
         }
     }
