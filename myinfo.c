@@ -185,7 +185,7 @@ void run_change() {
 			case 2: printf(".!! Error: Password must be 5 to 20 characters long.\n"); break;
 			case 3: printf(".!! Error: Password cannot contain spaces\n"); break;
 			case 4: printf(".!! Error: The password cannot contain 5 or more of the same letter, digit, or special character.\n"); break;
-			case 5: printf(".!! Error: Password must be at least 1 character long and include at least 1 digit\n"); break;
+			case 5: printf(".!! Error: Password must contain at least one letter and at least one digit.\n"); break;
 			default: printf(".!! Error: An unknown error occured\n"); break;
 			}
 			continue;
@@ -238,8 +238,8 @@ void run_withdraw() {
 
 	input[strcspn(input, "\n")] = '\0';
 
-	if (strcmp(input, "No") == 0) {
-		//printf("... Withdrawal cancelled.\n");
+	if (strcmp(input, "No") == 0 || strcmp(input, "no") == 0 ||
+	    strcmp(input, "NO") == 0 || strcmp(input, "nO") == 0) {
 		return;
 	}
 
