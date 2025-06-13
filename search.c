@@ -59,9 +59,11 @@ void freeSearchInput(SearchInput* input) {
     if (input->bid) free(input->bid);
 }
 
-SearchInput parseSearchInput(const char* rawInput) {
+SearchInput parseSearchInput(const char* rawInput, bool* success) {
     SearchInput input = { NULL, NULL, NULL };
     const char* p = rawInput;
+
+    *success = false;
 
     while (*p) {
         while (isspace(*p)) p++;
@@ -85,7 +87,14 @@ SearchInput parseSearchInput(const char* rawInput) {
         p++;  // skip ':'
 
         const char* val_start = p;
-        while (*p && !(strncmp(p, "title:", 6) == 0 || strncmp(p, "author:", 7) == 0 || strncmp(p, "bid:", 4) == 0)) {
+        while (*p) {
+            if (
+                ((strncmp(p, "title:", 6) == 0) && (p == rawInput || isspace(*(p - 1)))) ||
+                ((strncmp(p, "author:", 7) == 0) && (p == rawInput || isspace(*(p - 1)))) ||
+                ((strncmp(p, "bid:", 4) == 0) && (p == rawInput || isspace(*(p - 1))))
+                ) {
+                break;
+            }
             p++;
         }
 
@@ -98,7 +107,7 @@ SearchInput parseSearchInput(const char* rawInput) {
 
         // 빈 값 예외 처리
         if (val_len == 0) {
-            printf("!! Error: Empty value for field '%s'\n", key);
+            printf("!! Error: Empty value for field '%s'\n\n", key);
             freeSearchInput(&input);
             return input;
         }
@@ -106,7 +115,7 @@ SearchInput parseSearchInput(const char* rawInput) {
         // 안전하게 메모리 할당
         char* value = (char*)malloc(val_len + 1);
         if (!value) {
-            printf("!! Error: Memory allocation failed.\n");
+            printf("!! Error: Memory allocation failed.\n\n");
             freeSearchInput(&input);
             return input;
         }
@@ -118,7 +127,7 @@ SearchInput parseSearchInput(const char* rawInput) {
         // 중복 필드 체크 및 저장
         if (strcmp(key, "title") == 0) {
             if (input.title) {
-                printf("!! Error: Duplicate field 'title'\n");
+                printf("!! Error: Duplicate field 'title'\n\n");
                 free(value);
                 freeSearchInput(&input);
                 return input;
@@ -127,7 +136,7 @@ SearchInput parseSearchInput(const char* rawInput) {
         }
         else if (strcmp(key, "author") == 0) {
             if (input.author) {
-                printf("!! Error: Duplicate field 'author'\n");
+                printf("!! Error: Duplicate field 'author'\n\n");
                 free(value);
                 freeSearchInput(&input);
                 return input;
@@ -136,7 +145,7 @@ SearchInput parseSearchInput(const char* rawInput) {
         }
         else if (strcmp(key, "bid") == 0) {
             if (input.bid) {
-                printf("!! Error: Duplicate field 'bid'\n");
+                printf("!! Error: Duplicate field 'bid'\n\n");
                 free(value);
                 freeSearchInput(&input);
                 return input;
@@ -144,13 +153,14 @@ SearchInput parseSearchInput(const char* rawInput) {
             input.bid = value;
         }
         else {
-            printf("!! Error: Invalid field '%s'\n", key);
+            printf("!! Error: Invalid field '%s'\n\n", key);
             free(value);
             freeSearchInput(&input);
             return input;
         }
     }
 
+    *success = true;
     return input;
 }
 
@@ -165,7 +175,23 @@ Book* filterBooks(const Book* allBooks, int totalCount, SearchInput input, int* 
         // 조건 체크
         if (input.title && !match_string(book->title, input.title)) continue;
         if (input.author && !match_string(book->author, input.author)) continue;
-        if (input.bid && !match_string(book->bid, input.bid)) continue;
+        if (input.bid) {
+            char trimmed_bid[101];
+            strncpy(trimmed_bid, input.bid, 100);
+            trimmed_bid[100] = '\0';
+
+            // 좌측 공백 제거
+            char* start = trimmed_bid;
+            while (isspace((unsigned char)*start)) start++;
+
+            // 우측 공백 제거
+            char* end = start + strlen(start) - 1;
+            while (end > start && isspace((unsigned char)*end)) end--;
+            *(end + 1) = '\0';
+
+            // 완전 일치 비교
+            if (strcmp(book->bid, start) != 0) continue;
+        }
 
         results[count++] = *book; // 조건 만족 시 복사
     }
@@ -212,7 +238,12 @@ int run_search(int mode) {
             continue;
         }
 
-        SearchInput input = parseSearchInput(inputBuf);
+        bool success = false;
+        SearchInput input = parseSearchInput(inputBuf, &success);
+        if (!success) {
+            continue;
+        }
+
         if (!input.title && !input.author && !input.bid) {
             printf("!! Error: No valid field detected.\n\n");
             continue;
