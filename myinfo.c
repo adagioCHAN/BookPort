@@ -238,8 +238,8 @@ void run_withdraw() {
 
 	input[strcspn(input, "\n")] = '\0';
 
-	if (strcmp(input, "No") == 0) {
-		//printf("... Withdrawal cancelled.\n");
+	if (strcmp(input, "No") == 0 || strcmp(input, "no") == 0 ||
+	    strcmp(input, "NO") == 0 || strcmp(input, "nO") == 0) {
 		return;
 	}
 
