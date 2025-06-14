@@ -194,10 +194,10 @@ linked_list* read_user_data(bool* file_integrity) {
 			for (int j = 2; data->lentBids[i][j]; j++) {
 				if (!isdigit(data->lentBids[i][j])) {
 					if (data->lentBids[i][j] != '.') {
-						add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; pos = i; break;
+						add_violation_line(violation_lines, line_copy); *file_integrity = false; stop_flag = true; pos = j; break;
 					}
 					else {
-						pos = i;
+						pos = j;
 						break;
 					}
 				}
