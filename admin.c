@@ -9,49 +9,14 @@
 
 #define ADMIN_PASSWORD "@admin_1pw$"
 
-void print_book(Book* b) {
-    printf("> Title: %s\n", b->title);
-    printf("  Author: %s\n", b->author);
-    printf("  BID: %s\n", b->bid);
-}
-
-void free_list(linked_list* list, int type) {
-    if (!list) return;
-
-    node* current = list->head;
-    while (current != NULL) {
-        node* next = current->next;
-
-        switch (type) {
-        case 1:
-            free((User*)current->data);
-            break;
-        case 2:
-            free((Book*)current->data);
-            break;
-        case 3:
-            free((Lend_Return*)current->data);
-            break;
-        case 4:
-            free((char*)current->data);
-            break;
-        default:
-            break;
-        }
-        free(current);
-        current = next;
-    }
-    free(list);
-}
-
 char* get_admin_canonical_command(char* input) {
     struct {
         const char* synonyms[10];
         const char* canonical;
     } admin_table[] = {
         { { "add", "ad", "a" }, "add" },
-        { { "delete", "del", "de", "d" }, "delete" },
-        { { "exit", "ex", "e" }, "exit" }
+        { { "delete", "delet", "dele", "del", "de", "d" }, "delete" },
+        { { "exit", "exi", "ex", "e" }, "exit" }
     };
 
     for (int i = 0; i < sizeof(admin_table) / sizeof(admin_table[0]); ++i) {
@@ -124,6 +89,14 @@ void add() {
 
 void delete() {
     char bid_input[50];
+
+    bool book_integrity = true;
+    linked_list* book_list = read_book_data(&book_integrity);
+    if (!book_list) {
+        printf(".!! Error: Failed to read book data.\n");
+        return;
+    }
+
     while (1) {
         printf("BookPort: Administrator Mode - Enter BID of the book >");
         if (!fgets(bid_input, sizeof(bid_input), stdin)) return;
@@ -144,11 +117,9 @@ void delete() {
             continue;
         }
 
-        bool book_integrity = true;
-        linked_list* book_list = read_book_data(&book_integrity);
-        if (!book_list) {
-            printf(".!! Error: Failed to read book data.\n");
-            return;
+        if (is_valid_bid(bid_input) == 0) {
+            printf(".!! Error: BID contains invalid characters\n");
+            continue;
         }
 
         node* current = book_list->head;
@@ -166,23 +137,23 @@ void delete() {
 
         if (!target_book) {
             printf(".!! Error: The book does not exist.\n");
-            free_list(book_list, 2);
             continue;
         }
 
         if (target_book->isAvailable != 'Y') {
             printf(".!! Error: The book that is on loan cannot be deleted.\n");
-            free_list(book_list, 2);
             continue;
         }
 
         printf("...The following book matches the entered BID:\n");
-        print_book(target_book);
+        printf("> Title: %s\n", target_book->title);
+        printf("  Author: %s\n", target_book->author);
+        printf("  BID: %s\n", target_book->bid);
+        
 
         char confirm[10];
         printf("BookPort: Do you really want to delete this book? (...No) >");
         if (!fgets(confirm, sizeof(confirm), stdin)) {
-            free_list(book_list, 2);
             return;
         }
         confirm[strcspn(confirm, "\n")] = '\0';
@@ -190,7 +161,6 @@ void delete() {
         if (strcmp(confirm, "No") == 0 || strcmp(confirm, "no") == 0 ||
             strcmp(confirm, "NO") == 0 || strcmp(confirm, "nO") == 0) {
             printf("...Delete cancelled.\n");
-            free_list(book_list, 2);
             return;
         }
 
@@ -202,15 +172,29 @@ void delete() {
                 reserver->reserveAvailable += 1;
             }
             update_file(USER_FILE, user_list);
-            free_list(user_list, 1);
+            node* free_cursor = user_list->head;
+            while (free_cursor != NULL) {
+                node* next = free_cursor->next;
+                free(free_cursor->data);
+                free(free_cursor);
+                free_cursor = next;
+            }
+            free(user_list);
         }
 
 
         remove_node(book_list, target_book, 2);
         update_file(BOOK_FILE, book_list);
         printf("...Book deleted\n");
-
-        free_list(book_list, 2);
+        
+        node* free_cursor = book_list->head;
+        while (free_cursor != NULL) {
+            node* next = free_cursor->next;
+            free(free_cursor->data);
+            free(free_cursor);
+            free_cursor = next;
+        }
+        free(book_list);
         run_verify();
         return;
     }
