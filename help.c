@@ -15,7 +15,7 @@ void run_help(const char* argument) {
         return;
     }
 
-    // ¼¼ºÎ µµ¿ò¸» Ãâ·Â
+    // Â¼Â¼ÂºÃŽ ÂµÂµÂ¿Ã²Â¸Â» ÃƒÃ¢Â·Ã‚
     if (strcmp(canonical, "Help") == 0) {
         printf("Help : Show help for all or a specific command\n");
         printf("Synonyms:? Help Hel He h\n");
@@ -72,6 +72,12 @@ void run_help(const char* argument) {
         printf("Synonyms: info myinfo myinf myin myi my m\n");
         printf("Arguments: None\n");
         printf("Action: Moves to the myinfo prompt.\n Show currently logged-in user's info\n");
+    }
+    else if (strcmp(canonical, "admin") == 0) {
+        printf("Command that moves to the administrator prompt\n");
+        printf("Synonyms: adm admin admi\n");
+        printf("Arguments: None\n");
+        printf("Action: Moves to the administrator prompt.\n");
     }
         
 }
