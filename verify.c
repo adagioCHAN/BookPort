@@ -495,11 +495,6 @@ void run_verify() {
                 }
             }
 
-            if (!is_valid_overdue(lr->isOverdue ? "Y" : "N")) {
-                printf(" - Invalid overdue flag: %d\n", lr->isOverdue);
-                error_count++;
-            }
-
             current = current->next;
         }
     }
