@@ -70,7 +70,6 @@ typedef struct {
     char bookBid[MAX_BID];
     char borrowDate[MAX_DATE];
     char returnDate[MAX_DATE];
-	char isOverdue; // 'Y' for overdue, 'N' for not overdue
 } Lend_Return;
 
 extern int is_logged_in;
