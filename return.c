@@ -57,6 +57,18 @@ void auto_borrow(Book* temp_b, char returnDate[]) {
     return;
 }
 
+//구분자 제거 함수
+void remove_separators(char* str) {
+    char* src = str;
+    char* dst = str;
+    while (*src) {
+        if (*src != '-' && *src != '/') {
+            *dst++ = *src;
+        }
+        src++;
+    }
+    *dst = '\0';
+}
 
 
 void run_return() {
@@ -73,12 +85,14 @@ void run_return() {
     linked_list* user_list = read_user_data(&user_integrity);
     if (!user_integrity) {
         print_list(user_list, 5);
+        printf("1\n");
         return;
     }
     bool book_integrity = true;
     linked_list* book_list = read_book_data(&book_integrity);
     if (!book_integrity) {
         print_list(book_list, 4);
+        printf("2\n");
         return;
     }
     User* temp_u = NULL;
@@ -152,7 +166,7 @@ void run_return() {
     linked_list* lend_list = read_borrow_data(&lend_integrity);
     if (!lend_integrity) {
         print_list(lend_list, 5);
-        printf("here Error");
+        printf("here Error\n");
         return;
     }
     node* current_l = lend_list->head;
@@ -160,6 +174,7 @@ void run_return() {
         Lend_Return* lend = (Lend_Return*)current_l->data;
         if (!strcmp(lend->bookBid, temp_b->bid)) {
             temp_l = lend;
+            break;
         }
         current_l = current_l->next;
     }
@@ -168,12 +183,29 @@ void run_return() {
     {
         printf("Enter return date > ");
         fgets(return_date, sizeof(return_date), stdin);
+        return_date[strcspn(return_date, "\n")] = '\0';
         trim(return_date);
-
+        remove_separators(return_date);//구분자 제거 추가
         if (!is_valid_date(return_date)) {
             continue;
         }
-
+        // return 날짜 char-> int
+        int ry = 0, rm = 0, rd = 0;
+        if (sscanf(return_date, "%4d%2d%2d", &ry, &rm, &rd) != 3) {
+            printf("Error: Failed to parse return date. Please check the format.\n");
+            continue;
+        }
+        // borrow 날짜 char-> int
+        int by = 0, bm = 0, bd = 0;
+        if (sscanf(temp_l->borrowDate, "%4d%2d%2d", &by, &bm, &bd) != 3) {
+            printf("Warning: Failed to parse borrow date (%s). Skipping date comparison.\n", temp_l->borrowDate);
+            return;
+        }
+        if (ry < by || (ry == by && (rm < bm || (rm == bm && rd < bd)))) {
+            printf("Error: Return date (%04d-%02d-%02d) is earlier than borrow date (%04d-%02d-%02d). Please enter a valid date.\n",
+                ry, rm, rd, by, bm, bd);
+            continue;
+        }
         strcpy(temp_l->returnDate, return_date);
         //temp_l->isOverdue = 'N';
         break;
@@ -192,11 +224,9 @@ void run_return() {
         return;
     }
     else {
+		if (temp_b->studentId[0] != '\0')  auto_borrow(temp_b, temp_l->returnDate);
         temp_u->lendAvailable++;
         temp_b->isAvailable = 'Y';
-        if(temp_b->isReserveAvailable == 'Y') {
-            auto_borrow(temp_b, return_date);
-        }
     }
 
     if (!update_file(USER_FILE, user_list) || !update_file(BOOK_FILE, book_list) || !update_file(LEND_RETURN_FILE, lend_list)) {
