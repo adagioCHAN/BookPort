@@ -214,7 +214,6 @@ void run_return() {
     bool overdue = checkOverDue(return_date);
     struct tm date = { 0 };
     int ny, nm, nd;
-    printf("%04d.%02d.%02d\n", current_year, current_month, current_day);
     if (overdue) {
         date.tm_year = current_year - 1900;
         date.tm_mon = current_month - 1;
@@ -248,6 +247,10 @@ void run_return() {
         temp_b->isAvailable = 'Y';
         if (overdue) {
             current_user.isOverdue = 'Y';
+        }
+        else {
+            current_user.isOverdue = 'N';
+            penalty_day = 0;
         }
     }
 

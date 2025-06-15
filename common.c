@@ -83,14 +83,23 @@ void run_logout() {
 }
 
 bool checkOverDue(const char* input) {
-    struct tm date1 = { 0 }, date2 = { 0 };
+    struct tm date1 = { 0 }, date2 = { 0 }, date3 = { 0 };
+    time_t t1 = 0;
+    time_t t2 = 0;
+    time_t t3 = 0;
+    int tmp_penalty = 0, days;
+    double seconds;
     bool file_integrity = true;
+    bool all_returned = true;
     linked_list* borrow_list = read_borrow_data(&file_integrity);
     if (current_year == 0 && (strcmp(input, "") == 0)) return false;
     else {
         current_year = (input[0] - '0') * 1000 + (input[1] - '0') * 100 + (input[2] - '0') * 10 + (input[3] - '0');
         current_month = (input[4] - '0') * 10 + (input[5] - '0');
         current_day = (input[6] - '0') * 10 + (input[7] - '0');
+        date2.tm_year = current_year - 1900;
+        date2.tm_mon = current_month - 1;
+        date2.tm_mday = current_day;
         node* current = borrow_list->head;
         while (current != NULL) {
             Lend_Return* borrow_data = (Lend_Return*)current->data;
@@ -103,26 +112,34 @@ bool checkOverDue(const char* input) {
             int borrow_day = (borrow_data->borrowDate[6] - '0') * 10 + (borrow_data->borrowDate[7] - '0');
             date1.tm_year = borrow_year - 1900;
             date1.tm_mon = borrow_month - 1;
-            date1.tm_mday = borrow_month;
+            date1.tm_mday = borrow_day;
             if (strcmp(borrow_data->returnDate, "") != 0) {
                 int return_year = (borrow_data->returnDate[0] - '0') * 1000 + (borrow_data->returnDate[1] - '0') * 100 + (borrow_data->returnDate[2] - '0') * 10 + (borrow_data->returnDate[3] - '0');
                 int return_month = (borrow_data->returnDate[4] - '0') * 10 + (borrow_data->returnDate[5] - '0');
                 int return_day = (borrow_data->returnDate[6] - '0') * 10 + (borrow_data->returnDate[7] - '0');
-
-                date2.tm_year = return_year - 1900;
-                date2.tm_mon = return_month - 1;
-                date2.tm_mday = return_day;
+                
+                date3.tm_year = return_year - 1900;
+                date3.tm_mon = return_month - 1;
+                date3.tm_mday = return_day;
+                t1 = mktime(&date1);
+                t2 = mktime(&date3);
+                seconds = difftime(t2, t1);
+                days = (int)(seconds / (60 * 60 * 24));
+                if (days > 10) {
+                    if (tmp_penalty < days - 10) {
+                        tmp_penalty = days - 10;
+                        t3 = mktime(&date3);
+                    }
+                }
             }
             else {
-                date2.tm_year = current_year - 1900;
-                date2.tm_mon = current_month - 1;
-                date2.tm_mday = current_day;
+                all_returned = false;
             }
-            time_t t1 = mktime(&date1);
-            time_t t2 = mktime(&date2);
+            t1 = mktime(&date1);
+            t2 = mktime(&date2);
 
-            double seconds = difftime(t2, t1);
-            int days = (int)(seconds / (60 * 60 * 24));
+            seconds = difftime(t2, t1);
+            days = (int)(seconds / (60 * 60 * 24));
             if (days > 10) {
                 if (penalty_day < days - 10) {
                     penalty_day = days - 10;
@@ -131,6 +148,21 @@ bool checkOverDue(const char* input) {
 
             current = current->next;
         }
-        return penalty_day > 0;
+        if (!all_returned) {
+            return penalty_day > 0;
+        }
+        else {
+            if (t3 == 0) return false;
+            seconds = difftime(t2, t3);
+            days = (int)(seconds / (60 * 60 * 24));
+            if (days > tmp_penalty) {
+                penalty_day = 0;
+                return false;
+            }
+            else {
+                penalty_day = tmp_penalty;
+                return true;
+            }
+        }
     }
 }

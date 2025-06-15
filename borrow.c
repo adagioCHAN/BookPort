@@ -67,21 +67,6 @@ void run_borrow() {
         print_list(book_list, 4);
         return -1;
     }
-    if (current_user.isOverdue == 'Y') {
-        struct tm date = { 0 };
-        int ny, nm, nd;
-        ny = nm = nd = 0;
-        date.tm_year = current_year - 1900;
-        date.tm_mon = current_month - 1;
-        date.tm_mday = current_day + penalty_day;
-
-        mktime(&date);
-
-        ny = date.tm_year + 1900;
-        nm = date.tm_mon + 1;
-        nd = date.tm_mday;
-        printf(".!! Error: you got overdue penalty. you can borrow book after %04d-%02d-%02d\n", ny, nm, nd);
-    }
 
     int search_result = run_search(0);
     
@@ -209,6 +194,24 @@ void run_borrow() {
     char confirm[5];
     fgets(confirm, sizeof(confirm), stdin);
     trim(confirm);
+
+    bool isoverdue = checkOverDue(loan_date);
+    struct tm date = { 0 };
+    int ny, nm, nd;
+    if (isoverdue) {
+        current_user.isOverdue = 'Y';
+        date.tm_year = current_year - 1900;
+        date.tm_mon = current_month - 1;
+        date.tm_mday = current_day + penalty_day;
+
+        mktime(&date);
+
+        ny = date.tm_year + 1900;
+        nm = date.tm_mon + 1;
+        nd = date.tm_mday;
+        printf("you got overdue! return your book first\n");
+        return;
+    }
 
     if (_stricmp(confirm, "No") == 0) {
         printf("Borrowing cancelled.\n");
