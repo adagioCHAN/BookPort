@@ -134,17 +134,18 @@ bool checkOverDue(const char* input) {
             }
             else {
                 all_returned = false;
-            }
-            t1 = mktime(&date1);
-            t2 = mktime(&date2);
+                t1 = mktime(&date1);
+                t2 = mktime(&date2);
 
-            seconds = difftime(t2, t1);
-            days = (int)(seconds / (60 * 60 * 24));
-            if (days > 10) {
-                if (penalty_day < days - 10) {
-                    penalty_day = days - 10;
+                seconds = difftime(t2, t1);
+                days = (int)(seconds / (60 * 60 * 24));
+                if (days > 10) {
+                    if (penalty_day < days - 10) {
+                        penalty_day = days - 10;
+                    }
                 }
             }
+            
 
             current = current->next;
         }
