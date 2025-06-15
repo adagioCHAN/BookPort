@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 #include "common.h"
 #include "verify.h"
-
 
 void check_reserve_available(Book* bookBid, linked_list* book_list) {
     char buffer[200];
@@ -66,6 +66,21 @@ void run_borrow() {
     if (!book_integrity) {
         print_list(book_list, 4);
         return -1;
+    }
+    if (current_user.isOverdue == 'Y') {
+        struct tm date = { 0 };
+        int ny, nm, nd;
+        ny = nm = nd = 0;
+        date.tm_year = current_year - 1900;
+        date.tm_mon = current_month - 1;
+        date.tm_mday = current_day + penalty_day;
+
+        mktime(&date);
+
+        ny = date.tm_year + 1900;
+        nm = date.tm_mon + 1;
+        nd = date.tm_mday;
+        printf(".!! Error: you got overdue penalty. you can borrow book after %04d-%02d-%02d\n", ny, nm, nd);
     }
 
     int search_result = run_search(0);
@@ -214,6 +229,7 @@ void run_borrow() {
     if (user) {
         strcpy(user->lentBids[5 - user->lendAvailable], lend.bookBid);
         user->lendAvailable--;
+        current_user = *user;
     }
     update_file(USER_FILE, user_list);
     printf("user data success");

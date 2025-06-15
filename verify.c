@@ -387,6 +387,11 @@ void run_verify() {
                 printf(" - Invalid lendAvailable for %s\n", u->studentId);
                 error_count++;
             }
+            
+            if (!(u->isOverdue == 'Y' || u->isOverdue == 'N')) {
+                printf(" - Invalid isOverdue for %s\n", u->isOverdue);
+                error_count++;
+            }
 
             current = current->next;
         }

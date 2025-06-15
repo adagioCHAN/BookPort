@@ -74,6 +74,7 @@ typedef struct {
 
 extern int is_logged_in;
 extern User current_user;
+extern int penalty_day, current_year, current_month, current_day;
 
 void run_help(const char* argument);
 void run_verify();
@@ -85,6 +86,7 @@ void run_borrow();
 void run_return();
 void run_myinfo();
 void run_admin();
+bool checkOverDue(const char* input);
 
 void print_command_usage();
 char* get_canonical_command(const char* input);

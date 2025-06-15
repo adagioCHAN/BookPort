@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <time.h>
 #include "common.h"
 #include "verify.h"
 
@@ -210,7 +211,25 @@ void run_return() {
         //temp_l->isOverdue = 'N';
         break;
     }
+    bool overdue = checkOverDue(return_date);
+    struct tm date = { 0 };
+    int ny, nm, nd;
+    printf("%04d.%02d.%02d\n", current_year, current_month, current_day);
+    if (overdue) {
+        date.tm_year = current_year - 1900;
+        date.tm_mon = current_month - 1;
+        date.tm_mday = current_day + penalty_day;
+
+        mktime(&date);
+
+        ny = date.tm_year + 1900;
+        nm = date.tm_mon + 1;
+        nd = date.tm_mday;
+        printf("you got overdue penalty! you can borrow book after %04d.%02d.%02d\n", ny, nm, nd);
+    }
+
     printf("\n[He following book matches the entered BID]\n");
+
 
     printf("> Title: %s\n  Author: %s\n  BID: %s\n\n", temp_b->title, temp_b->author, temp_b->bid);
 
@@ -227,6 +246,9 @@ void run_return() {
 		if (temp_b->studentId[0] != '\0')  auto_borrow(temp_b, temp_l->returnDate);
         temp_u->lendAvailable++;
         temp_b->isAvailable = 'Y';
+        if (overdue) {
+            current_user.isOverdue = 'Y';
+        }
     }
 
     if (!update_file(USER_FILE, user_list) || !update_file(BOOK_FILE, book_list) || !update_file(LEND_RETURN_FILE, lend_list)) {
