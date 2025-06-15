@@ -232,6 +232,12 @@ void run_borrow() {
     if (user) {
         strcpy(user->lentBids[5 - user->lendAvailable], lend.bookBid);
         user->lendAvailable--;
+        if (isoverdue) {
+            user->isOverdue = 'Y';
+        }
+        else {
+            user->isOverdue = 'N';
+        }
         current_user = *user;
     }
     update_file(USER_FILE, user_list);

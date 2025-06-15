@@ -247,10 +247,12 @@ void run_return() {
         temp_b->isAvailable = 'Y';
         if (overdue) {
             current_user.isOverdue = 'Y';
+            temp_u->isOverdue = 'Y';
         }
         else {
             current_user.isOverdue = 'N';
             penalty_day = 0;
+            temp_u->isOverdue = 'N';
         }
     }
 
