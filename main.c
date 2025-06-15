@@ -5,8 +5,8 @@
 #include <time.h>
 #include "common.h"
 
-// ¹®ÀÚ¿­ ¾ÕµÚ °ø¹é Á¦°Å
-// ¿øº» ¹®ÀÚ¿­À» Á÷Á¢ ¼öÁ¤ÇÏ´Â trim ÇÔ¼ö
+// ë¬¸ìì—´ ì•ë’¤ ê³µë°± ì œê±°
+// ì›ë³¸ ë¬¸ìì—´ì„ ì§ì ‘ ìˆ˜ì •í•˜ëŠ” trim í•¨ìˆ˜
 void trim(char* str) {
     char* start = str;
     while (isspace((unsigned char)*start)) start++;
@@ -19,12 +19,12 @@ void trim(char* str) {
     while (end > start && isspace((unsigned char)*end)) end--;
     *(end + 1) = '\0';
 
-    // ¾Õ °ø¹é Á¦°Å¸¦ À§ÇØ ¹®ÀÚ¿­À» ¾ÕÀ¸·Î ÀÌµ¿
+    // ì• ê³µë°± ì œê±°ë¥¼ ìœ„í•´ ë¬¸ìì—´ì„ ì•ìœ¼ë¡œ ì´ë™
     if (start != str) memmove(str, start, end - start + 2);
 }
 
 
-// ¸í·É¾î Á¤±ÔÈ­
+// ëª…ë ¹ì–´ ì •ê·œí™”
 char* get_canonical_command(char* input) {
     struct {
         const char* synonyms[20];
@@ -40,7 +40,7 @@ char* get_canonical_command(char* input) {
         { { "$", "borrow", "borro", "borr", "bor", "bo", "b" }, "borrow" },
         { { "r", "return", "retur", "retu", "ret", "re" }, "return" },
         { { "info", "myinfo", "myinf", "myin", "myi", "my", "m" }, "myinfo" },
-        { { "adm", "admi", "admin"}, "admin"}
+        { { "admin", "adm", "admi"}, "admin"}
     };
 
     for (int i = 0; i < sizeof(cmd_table) / sizeof(cmd_table[0]); i++) {
@@ -52,7 +52,7 @@ char* get_canonical_command(char* input) {
     return NULL;
 }
 
-// ¸í·É¾î Ç¥ Ãâ·Â
+// ëª…ë ¹ì–´ í‘œ ì¶œë ¥
 void print_command_usage() {
     printf("--------------------------------------------------------------\n");
     printf(" Command | Arguments              | Description               \n");
@@ -65,7 +65,7 @@ void print_command_usage() {
     printf(" $ borrow| None                   | Move to borrow prompt     \n");
     printf(" a account| None                  | Move to create account prompt\n");
     printf(" r return| None                   | Move to return prompt     \n");
-    printf(" info myinfo| None               | Show member¡¯s information \n");
+    printf(" info myinfo| None               | Show memberâ€™s information \n");
     printf(" adm admin | None            | Move to admin page\n");
     printf("--------------------------------------------------------------\n");
 }
@@ -100,9 +100,9 @@ int main() {
                 print_command_usage();
                 continue;
             }
-            run_help(argument); // help.c¿¡ Á¤ÀÇµÊ
+            run_help(argument); // help.cì— ì •ì˜ë¨
         }
-        // ´Ù¸¥ ¸í·É¾îµé (ÀÎÀÚ ÀÖÀ¸¸é ¿¡·¯)
+        // ë‹¤ë¥¸ ëª…ë ¹ì–´ë“¤ (ì¸ì ìˆìœ¼ë©´ ì—ëŸ¬)
         else if (strcmp(cmd, "quit") == 0 ||
             strcmp(cmd, "verify") == 0 ||
             strcmp(cmd, "account") == 0 ||
@@ -120,7 +120,7 @@ int main() {
                 continue;
             }
 
-            // ¿¬°á
+            // ì—°ê²°
             if (strcmp(cmd, "quit") == 0) {
                 break;
             }
