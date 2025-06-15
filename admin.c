@@ -53,10 +53,29 @@ void add() {
     }
     while (1) {
         printf("Enter BID: ");
-        fgets(bid, sizeof(bid), stdin);
+        if (!fgets(bid, sizeof(bid), stdin)) return;
         bid[strcspn(bid, "\n")] = 0;
-        if (!is_valid_bid(bid) || !is_unique_bid(bid)) {
-            printf(".!! Error: Invalid or duplicate BID.\n");
+        if (is_valid_bid(bid) == 7) {
+            printf(".!! Error: BID cannot be an empty string\n");
+            continue;
+        }
+
+        if (is_valid_bid(bid) == 8) {
+            printf(".!! Error: BID cannot consist of only whitespace characters\n");
+            continue;
+        }
+
+        if (is_valid_bid(bid) == 9) {
+            printf(".!! Error: A tab character cannot be placed between the first and last valid characters of the BID\n");
+            continue;
+        }
+
+        if (is_valid_bid(bid) == 0) {
+            printf(".!! Error: BID contains invalid characters\n");
+            continue;
+        }
+        if (!is_unique_bid(bid)) {
+            printf("Error: A book with the specified BID already exists.\n");
             continue;
         }
         break;
@@ -149,7 +168,7 @@ void delete() {
         printf("> Title: %s\n", target_book->title);
         printf("  Author: %s\n", target_book->author);
         printf("  BID: %s\n", target_book->bid);
-        
+
 
         char confirm[10];
         printf("BookPort: Do you really want to delete this book? (...No) >");
@@ -186,7 +205,7 @@ void delete() {
         remove_node(book_list, target_book, 2);
         update_file(BOOK_FILE, book_list);
         printf("...Book deleted\n");
-        
+
         node* free_cursor = book_list->head;
         while (free_cursor != NULL) {
             node* next = free_cursor->next;
