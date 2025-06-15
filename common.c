@@ -145,7 +145,6 @@ bool checkOverDue(const char* input) {
                     }
                 }
             }
-            
 
             current = current->next;
         }
@@ -154,6 +153,7 @@ bool checkOverDue(const char* input) {
         }
         else {
             if (t3 == 0) return false;
+            t2 = mktime(&date2);
             seconds = difftime(t2, t3);
             days = (int)(seconds / (60 * 60 * 24));
             if (days > tmp_penalty) {
